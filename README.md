@@ -1,0 +1,1 @@
+# maplink-generator
