@@ -1,12 +1,29 @@
-<!doctype html>
-<title>Hyphenated</title>
+{% extends "layout.html" %}
+{% block title %}Hyphenated{% endblock %}
+{% block head %}
+  {{ super() }}
+  <style type="text/css">
+    .important { color: #336699; }
+  </style>
+{% endblock %}
+{% block content %}
+  <h1>Result</h1>
 
-<form action="{{ submit_url }}" method="post" target="_blank">
-    <div>
-        <textarea id="wpTextbox1" name="wpTextbox1" readonly>{{ newtext }}</textarea>
+  <div role="alert" class="text-center alert {% if count > 0 %}alert-primary">
+{{ count }} ISBNs have been formatted!
+  {% else %}alert-secondary">
+(No difference)      
+  {% endif %}
+  </div>
+<form action="{{ submit_url }}" method="post" target="_blank" class="pt-2">
+    <div class="form-group">
+        <textarea id="wpTextbox1" name="wpTextbox1" 
+            class="form-control text-monospace" cols=80 rows=25 
+            spellcheck="false">{{ newtext }}</textarea>
     </div>
     <div>
-        <input type="hidden" name="wpSummary" value="Cleaned up ISBNs using [[toolforge:anticompositetools/hyphenator]]" />
+        <input type="hidden" name="wpSummary" 
+            value="Cleaned up ISBNs using [[toolforge:anticompositetools/hyphenator]]" />
         <input type="hidden" name="wpStarttine" value="{{ start_time }}" />
         <input type="hidden" name="wpEdittime" value="{{ edit_time }}" />
         <input type="hidden" name="wpDiff" value="Show changes"/>
@@ -14,8 +31,11 @@
         <input type="hidden" name="wpAutoSummary" value="fakehash" />
         <input type="hidden" name="wpUltimateParam" value="1" >
     </div>
-    <div class="button">
-        <button type="submit">Preview/save</button>
+    <div class="button form-group mb-0">
+        <button type="submit" class="btn btn-primary "
+            {% if count == 0 %} disabled {% endif %}>Preview/save</button>
+        <a class="btn btn-link text-danger" 
+            href={{url_for('hyphenator_form')}}>Cancel</a>
     </div>
 </form>
-
+{% endblock %}

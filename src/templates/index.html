@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+{% block title %}Index{% endblock %}
+{% block head %}
+  {{ super() }}
+  <style type="text/css">
+    .important { color: #336699; }
+  </style>
+{% endblock %}
+{% block content %}
+  <div class="jumbotron">
+    <div class="container">
+      <h1 class="display-4">AntiCompositeTools</h1>
+      <p>A series of tools built by User:AntiCompositeNumber</p>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="card-deck">
+      
+      <div class="card">
+        <div class="card-body">
+          <h2 class="card-title">Hyphenator</h2>
+          <p class="card-text">Automatically hyphenates ISBNs and converts 10-digit ISBNs to 13-digit ISBNs.</p>
+          <p><a class="card-link" href="#" role="button">Run</a></p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-body">
+          <h2 class="card-title">HijackSpam</h2>
+          <p class="card-text">This report, automatically created by AntiCompositeBot, list pages that link to what used to be an academic journal but is now malware and spam.</p>
+          <p><a class="card-link" href="#" role="button">View details &raquo;</a></p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+{% endblock %}

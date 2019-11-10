@@ -25,11 +25,11 @@ app = flask.Flask(__name__)
 
 @app.route('/')
 def index():
-    return 'Hello World'
+    return flask.render_template('index.html')
 
 
 @app.route('/hyphenator', methods=['GET'])
-def hyphenate():
+def hyphenator_form():
     return flask.render_template('hyphenator-form.html')
 
 
@@ -42,8 +42,8 @@ def hypenator_output():
             submit_url = pageurl + '&action=submit'
         else:
             submit_url = pageurl + '?action=submit'
-            newtext, times = hyphenator.main(pageurl)
+            newtext, times, count = hyphenator.main(pageurl)
 
         return flask.render_template(
-                'hyphenator-output.html', submit_url=submit_url,
+                'hyphenator-output.html', count=count, submit_url=submit_url,
                 newtext=newtext, edit_time=times[0], start_time=times[1])

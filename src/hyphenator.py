@@ -82,17 +82,20 @@ def main(url):
     try:
         wikitext, times = get_wikitext(url)
     except Exception as err:
-        return err, ('', '')
+        return err, ('', ''), 0
 
     code = mwparserfromhell.parse(wikitext)
+    count = 0
     for template, raw_isbn, para in find_isbns(code):
         if not check_isbn(raw_isbn):
             continue
 
         new_isbn = isbn.format(raw_isbn, convert=True)
-        template.add(para, new_isbn)
+        if raw_isbn != new_isbn:
+            count += 1
+            template.add(para, new_isbn)
 
-    return code, times
+    return code, times, count
 
 
 if __name__ == '__main__':

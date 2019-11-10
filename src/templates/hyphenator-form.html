@@ -1,16 +1,32 @@
-<!doctype html>
-<title>Hyphenator</title>
-
-<p>This tool will automatically hyphenate ISBNs and convert 10-digit ISBNs to 13-digit ISBNs.</p>
-<p>It only supports ISBNs in {{ '{{' }}ISBN}}, {{ '{{' }}ISBNT}}, and any citation with a |isbn= parameter.
-Magic links are not supported.</p>
+{% extends "layout.html" %}
+{% block title %}Hyphenator{% endblock %}
+{% block head %}
+  {{ super() }}
+  <style type="text/css">
+    .important { color: #336699; }
+  </style>
+{% endblock %}
+{% block content %}
+  <h1>Hyphenator</h1>
+  <p class="important">
+    <p>
+      This tool will automatically hyphenate ISBNs and 
+      convert 10-digit ISBNs to 13-digit ISBNs.
+    </p>
+    <p>
+      It only supports ISBNs in <code class="text-reset">{{ '{{ISBN}}' }}</code>,
+      <code class="text-reset">{{ '{{ISBNT}}' }}</code>, 
+      and any citation with an <code class="text-reset">|isbn=</code>
+      parameter. Magic links are not supported.
+    </p>
 
 <form action="/hyphenator/output" method="post">
-    <div>
+    <div class="form-group">
         <label for="url">Page URL:</label>
-        <input type="url" id="url" name="page_url" />
+        <input type="url" id="url" name="page_url" / class="form-control">
     </div>
-    <div class="button">
-        <button type="submit">Submit</button>
+    <div class="form-group button">
+        <button type="submit" class="btn btn-primary">Submit</button>
     </div>
 </form>
+{% endblock %}
