@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://tools-static.wmflabs.org/cdnjs/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://tools-static.wmflabs.org/cdnjs/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css"  crossorigin="anonymous">
     <link rel="stylesheet" href="https://tools-static.wmflabs.org/cdnjs/ajax/libs/font-awesome/5.11.2/css/fontawesome.css">
     <link rel="stylesheet" href="https://tools-static.wmflabs.org/cdnjs/ajax/libs/font-awesome/5.11.2/css/brands.css">
     {% block head %}
@@ -36,13 +36,13 @@
     </nav>
 
     <br>
-    <main role="main" class="container p-3 mt-5 mx-auto bg-white">
+    <main role="main" class="container p-3 mt-5 mx-auto bg-white" style="height:100%">
     {% block content %}
     {% endblock %}
     </main>
     <footer >
     {% block footer %}
-      <div class="mh-auto p-3 text-right position-fixed" style="bottom:0; width:100%">
+      <div class="mh-auto p-3 mt-5 text-right position-relative " style="bottom:0; width:100%">
         <hr>
         <span class="text-muted pr-3">
           This project is licensed under the <a class="text-reset" href="https://www.apache.org/licenses/LICENSE-2.0">Apache License, version 2.0</a>.
@@ -56,8 +56,8 @@
     </footer>
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/jquery/3.3.1/jquery.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/popper.js/1.14.7/esm/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/jquery/3.3.1/jquery.slim.min.js" crossorigin="anonymous"></script>
+    <script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/popper.js/1.14.7/esm/popper.min.js" crossorigin="anonymous"></script>
+    <script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js" crossorigin="anonymous"></script>
   </body>
 </html>
