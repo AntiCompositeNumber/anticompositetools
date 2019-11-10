@@ -34,7 +34,7 @@ def hyphenator_form():
 
 
 @app.route('/hyphenator/output', methods=['POST'])
-def hypenator_output():
+def hyphenator_output():
     if flask.request.method == 'POST':
         pageurl = flask.request.form['page_url']
 
