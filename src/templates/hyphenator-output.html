@@ -1,0 +1,15 @@
+<!doctype html>
+<title>Hyphenated</title>
+
+<form action="{{ submit_url }}" method="post">
+    <div>
+        <textarea id="wpTextbox1" name="wpTextbox1" readonly>{{ newtext }}</textarea>
+    </div>
+    <div>
+        <input type="hidden" name="wpSummary" value="Cleaned up ISBNs using [[toolforge:anticompositetools/hyphenator]]" >
+    </div>
+    <div class="button">
+        <button type="submit">Preview/save</button>
+    </div>
+</form>
+

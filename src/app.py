@@ -18,13 +18,28 @@
 # limitations under the License.
 
 import flask
+import hyphenator
 
 app = flask.Flask(__name__)
+
 
 @app.route('/')
 def index():
     return 'Hello World'
 
-@app.route('/hyphenator')
-def hyphenator():
-    return 'Hyphenator'
+
+@app.route('/hyphenator', methods=['GET', 'POST'])
+def hyphenate():
+    if flask.request.method == 'POST':
+        pageurl = flask.request.form['page_url']
+
+        if '?' in pageurl:
+            submit_url = pageurl + '&action=submit'
+        else:
+            submit_url = pageurl + '?action=submit'
+            newtext = hyphenator.main(pageurl)
+
+        return flask.render_template('hyphenator-output.html',
+                                     submit_url=submit_url, newtext=newtext)
+    else:
+        return flask.render_template('hyphenator-form.html')
