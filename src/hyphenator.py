@@ -29,8 +29,11 @@ def get_wikitext(url):
     else:
         wikitext_url = url + '?action=raw'
 
-    headers = {'user-agent': 'anticompositetools Hyphenator, '
-               'AntiCompositeNumber'}
+    headers = {'user-agent': 'anticompositetools/hyphenator '
+               '(https://tools.wmflabs.org/anticompositetools/hyphenator; '
+               'tools.anticompositetools@tools.wmflabs.org) python-requests/'
+               + requests.__version__}
+
     for i in range(1, 5):
         try:
             request = requests.get(wikitext_url, headers=headers)
