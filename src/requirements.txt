@@ -1,0 +1,4 @@
+flask
+python-stdnum
+requests
+mwparserfromhell
