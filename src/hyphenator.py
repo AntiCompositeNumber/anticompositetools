@@ -39,9 +39,14 @@ def get_wikitext(url):
             time.sleep(5)
             continue
         else:
+            start_time = time.strftime('%Y%m%d%H%M%S', time.gmtime())
             break
 
-    return request.text
+    timestruct = time.strptime(request.headers['Last-Modified'],
+                               '%a, %d %b %Y %H:%M:%S %Z')
+    edit_time = time.strftime('%Y%m%d%H%M%S', timestruct)
+
+    return (request.text, (edit_time, start_time))
 
 
 def find_isbns(code):
@@ -75,9 +80,9 @@ def check_isbn(raw_isbn):
 
 def main(url):
     try:
-        wikitext = get_wikitext(url)
-    except Exception:
-        return 'It broke.'
+        wikitext, times = get_wikitext(url)
+    except Exception as err:
+        return err, ('', '')
 
     code = mwparserfromhell.parse(wikitext)
     for template, raw_isbn, para in find_isbns(code):
@@ -87,7 +92,7 @@ def main(url):
         new_isbn = isbn.format(raw_isbn, convert=True)
         template.add(para, new_isbn)
 
-    return code
+    return code, times
 
 
 if __name__ == '__main__':
