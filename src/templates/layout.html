@@ -39,8 +39,10 @@
     <main role="main" class="container p-3 mt-5 mx-auto bg-white">
     {% block content %}
     {% endblock %}
+    </main>
+    <footer >
     {% block footer %}
-      <div class="fixed-bottom m-3 text-right">
+      <div class="mh-auto p-3 text-right position-fixed" style="bottom:0; width:100%">
         <hr>
         <span class="text-muted pr-3">
           This project is licensed under the <a class="text-reset" href="https://www.apache.org/licenses/LICENSE-2.0">Apache License, version 2.0</a>.
@@ -51,7 +53,7 @@
         </span>
       </div>
     {% endblock %}
-    </main>
+    </footer>
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/jquery/3.3.1/jquery.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
