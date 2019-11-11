@@ -22,7 +22,7 @@ import os
 import json
 import flask
 import hyphenator
-import hashlib
+import hmac
 
 app = flask.Flask(__name__)
 
@@ -38,11 +38,11 @@ def index():
 
 @app.route('/deploy', methods=['POST'])
 def deploy():
-    r_hmac = hashlib.hmac.new(app.config['github_secret'],
-                              msg=flask.request.get_data(), digestmod='sha1')
+    r_hmac = hmac.new(app.config['github_secret'],
+                      msg=flask.request.get_data(), digestmod='sha1')
     r_digest = 'sha1=' + r_hmac.hexdigest()
     g_digest = flask.request.form['X-Hub-Signature']
-    logging.info(hashlib.hmac.compare_digest(r_digest, g_digest))
+    logging.info(hmac.compare_digest(r_digest, g_digest))
     logging.debug(r_digest)
     logging.debug(flask.request.get_data())
     return '', 204
