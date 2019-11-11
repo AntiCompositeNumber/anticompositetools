@@ -17,15 +17,35 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
+import os
+import json
 import flask
 import hyphenator
+import hashlib
 
 app = flask.Flask(__name__)
+
+__dir__ = os.path.dirname(__file__)
+app.config.update(json.load(open(os.path.join(__dir__, 'config.json'))))
+logging.basiConfig(filename='act.log', level=logging.DEBUG)
 
 
 @app.route('/')
 def index():
     return flask.render_template('index.html')
+
+
+@app.route('/deploy', methods=['POST'])
+def deploy():
+    r_hmac = hashlib.hmac.new(app.config['github_secret'],
+                              msg=flask.request.get_data(), digestmod='sha1')
+    r_digest = 'sha1=' + r_hmac.hexdigest()
+    g_digest = flask.request.form['X-Hub-Signature']
+    logging.info(hashlib.hmac.compare_digest(r_digest, g_digest))
+    logging.debug(r_digest)
+    logging.debug(flask.request.get_data())
+    return '', 204
 
 
 @app.route('/hyphenator', methods=['GET'])
