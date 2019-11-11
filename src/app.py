@@ -28,7 +28,7 @@ app = flask.Flask(__name__)
 
 __dir__ = os.path.dirname(__file__)
 app.config.update(json.load(open(os.path.join(__dir__, 'config.json'))))
-logging.basiConfig(filename='act.log', level=logging.DEBUG)
+logging.basicConfig(filename='act.log', level=logging.DEBUG)
 
 
 @app.route('/')
