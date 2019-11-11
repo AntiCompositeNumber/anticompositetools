@@ -41,7 +41,7 @@ def deploy():
     r_hmac = hmac.new((app.config['github_secret']).encode(),
                       msg=flask.request.get_data(), digestmod='sha1')
     r_digest = 'sha1=' + r_hmac.hexdigest()
-    g_digest = flask.request.form['X-Hub-Signature']
+    g_digest = flask.request.headers['X-Hub-Signature']
     compare = hmac.compare_digest(r_digest, g_digest)
     logging.info(compare)
     logging.debug(r_digest)
