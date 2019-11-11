@@ -42,10 +42,11 @@ def deploy():
                       msg=flask.request.get_data(), digestmod='sha1')
     r_digest = 'sha1=' + r_hmac.hexdigest()
     g_digest = flask.request.form['X-Hub-Signature']
-    logging.info(hmac.compare_digest(r_digest, g_digest))
+    compare = hmac.compare_digest(r_digest, g_digest)
+    logging.info(compare)
     logging.debug(r_digest)
     logging.debug(flask.request.get_data())
-    return ''
+    return compare
 
 
 @app.route('/hyphenator', methods=['GET'])
