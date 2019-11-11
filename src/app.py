@@ -45,7 +45,7 @@ def deploy():
     logging.info(hmac.compare_digest(r_digest, g_digest))
     logging.debug(r_digest)
     logging.debug(flask.request.get_data())
-    return '', 204
+    return ''
 
 
 @app.route('/hyphenator', methods=['GET'])
