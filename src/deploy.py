@@ -51,7 +51,7 @@ def deploy(request, config):
             try:
                 pull = subprocess.run(
                     ['git', '-C', '~/anticompositetools/', 'pull'], check=True,
-                    text=True, capture_output=True)
+                    universal_newlines=True, capture_output=True)
                 logging.debug(pull.stdout)
                 logging.error(pull.stderr)
             except subprocess.CalledProcessError as cpe:
