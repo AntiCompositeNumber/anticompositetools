@@ -46,12 +46,13 @@ def index():
 @app.route('/deploy', methods=['POST'])
 def autodeploy():
     request = flask.request
-    logging.debug(request)
-    logging.debug(request.json)
+    logging.debug('Request:' + request)
+    logging.debug('Request JSON:' + request.json)
     if deploy.verify_hmac(flask.request, app.config):
         try:
             deploy_result = deploy.deploy(request, request.json, app.config)
         except Exception as problem:
+            logging.error(problem)
             return 'Exception while deploying:\n' + str(problem), 500
         if deploy_result:
             flask.abort(204)
