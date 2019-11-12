@@ -47,7 +47,7 @@ def index():
 def autodeploy():
     if deploy.verify_hmac(flask.request, app.config):
         try:
-            deploy_result = deploy.main(flask.request, app.config)
+            deploy_result = deploy.deploy(flask.request, app.config)
         except Exception as problem:
             return 'Exception while deploying:\n' + str(problem), 500
         if deploy_result:
