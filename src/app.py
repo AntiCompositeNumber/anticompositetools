@@ -22,7 +22,7 @@ import os
 import json
 import flask
 import hyphenator
-import hmac
+import deploy
 
 app = flask.Flask(__name__)
 
@@ -37,16 +37,19 @@ def index():
 
 
 @app.route('/deploy', methods=['POST'])
-def deploy():
-    r_hmac = hmac.new((app.config['github_secret']).encode(),
-                      msg=flask.request.get_data(), digestmod='sha1')
-    r_digest = 'sha1=' + r_hmac.hexdigest()
-    g_digest = flask.request.headers['X-Hub-Signature']
-    compare = hmac.compare_digest(r_digest, g_digest)
-    logging.info(compare)
-    logging.debug(r_digest)
-    logging.debug(flask.request.get_data())
-    return compare
+def autodeploy():
+    if deploy.verify_hmac(flask.response, app.config):
+        try:
+            deploy_result = deploy.main(flask.response, app.config)
+        except Exception:
+            flask.abort(500)
+
+        if deploy_result:
+            flask.abort(204)
+        else:
+            flask.abort(504)
+    else:
+        flask.abort(403)
 
 
 @app.route('/hyphenator', methods=['GET'])
