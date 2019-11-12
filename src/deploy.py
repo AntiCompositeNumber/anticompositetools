@@ -22,6 +22,8 @@ import subprocess
 import requests
 import hmac
 
+logging.basicConfig(filename='act.log', level=logging.DEBUG)
+
 
 def verify_hmac(request, config):
     r_hmac = hmac.new((config['github_secret']).encode(),
@@ -47,12 +49,17 @@ def deploy(request, config):
             deployment_url = deployment_json['url']
             logging.info('Pulling from git repository')
             try:
-                subprocess.run(
-                    ['git', '-C', '~/anticompositetools/', 'pull'], check=True)
-            except subprocess.CalledProcessError:
+                pull = subprocess.run(
+                    ['git', '-C', '~/anticompositetools/', 'pull'], check=True,
+                    text=True, caputure_output=True)
+                logging.debug(pull.stdout)
+                logging.error(pull.stderr)
+            except subprocess.CalledProcessError as cpe:
+                logging.error(str(cpe))
                 new_status = requests.post(deployment_url + '/statuses',
                                            payload={'state': 'failure'},
                                            auth=config['github_deploy_pat'])
+                logging.debug(new_status.text)
                 if new_status.status_code == 201:
                     return True
                 else:
@@ -61,7 +68,9 @@ def deploy(request, config):
                 new_status = requests.post(deployment_url + '/statuses',
                                            payload={'state': 'success'},
                                            auth=config['github_deploy_pat'])
+                logging.debug(new_status.text)
                 if new_status.status_code == 201:
+                    logging.info('Webservice restarting!')
                     subprocess.Popen(['webservice', 'restart'])
                     return True
                 else:
