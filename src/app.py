@@ -43,8 +43,7 @@ def autodeploy():
         try:
             deploy_result = deploy.main(flask.request, app.config)
         except Exception:
-            flask.abort(500)
-
+            return 'Exception while deploying', 500
         if deploy_result:
             flask.abort(204)
         else:
