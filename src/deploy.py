@@ -33,7 +33,7 @@ def verify_hmac(request, config):
     return hmac.compare_digest(r_digest, g_digest)
 
 
-def deploy(request, config):
+def deploy(request, request_json, config):
     push_json = request.josn
     push_ref = push_json['ref']
     if push_ref == 'refs/heads/master':
