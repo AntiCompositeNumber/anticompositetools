@@ -33,8 +33,8 @@ def verify_hmac(request, config):
     return hmac.compare_digest(r_digest, g_digest)
 
 
-def deploy(request, request_json, config):
-    push_json = request.josn
+def deploy(request, push_json, config):
+    logging.debug('deploy()')
     push_ref = push_json['ref']
     if push_ref == 'refs/heads/master':
         logging.info('Push event recieved from GitHub for ' + push_ref)
