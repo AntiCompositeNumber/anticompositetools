@@ -56,16 +56,16 @@ def find_isbns(code):
     for template in code.ifilter_templates():
         if template.name.matches('ISBN') or template.name.matches('ISBNT'):
             try:
-                raw_isbn = template.get('1').value
+                raw_isbn = template.get('1').value.strip()
             except ValueError:
                 continue
             para = '1'
 
         elif template.has('isbn', ignore_empty=True):
-            raw_isbn = template.get('isbn').value
+            raw_isbn = template.get('isbn').value.strip()
             para = 'isbn'
         elif template.has('ISBN', ignore_empty=True):
-            raw_isbn = template.get('ISBN').value
+            raw_isbn = template.get('ISBN').value.strip()
             para = 'ISBN'
         else:
             continue
