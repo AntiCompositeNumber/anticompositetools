@@ -44,8 +44,8 @@ def deploy(request, push_json, config):
         deployment_payload = {'ref': push_ref}
         deployment_r = requests.post(
             push_json['repository']['deployments_url'],
-            auth=config['github_deploy_pat'], params=deployment_payload)
-        logging.debug(deployment_r.txt)
+            auth=config['github_deploy_pat'], data=deployment_payload)
+        logging.debug(deployment_r.text)
         if deployment_r.status_code == 201:
             deployment_json = deployment_r.json
             deployment_url = deployment_json['url']
@@ -60,7 +60,7 @@ def deploy(request, push_json, config):
             except subprocess.CalledProcessError as cpe:
                 logging.error(str(cpe))
                 new_status = requests.post(deployment_url + '/statuses',
-                                           payload={'state': 'failure'},
+                                           data={'state': 'failure'},
                                            auth=config['github_deploy_pat'])
                 logging.debug(new_status.text)
                 if new_status.status_code == 201:
@@ -69,7 +69,7 @@ def deploy(request, push_json, config):
                     return False
             else:
                 new_status = requests.post(deployment_url + '/statuses',
-                                           payload={'state': 'success'},
+                                           data={'state': 'success'},
                                            auth=config['github_deploy_pat'])
                 logging.debug(new_status.text)
                 if new_status.status_code == 201:
