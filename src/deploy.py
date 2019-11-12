@@ -34,7 +34,7 @@ def verify_hmac(request, config):
 
 
 def deploy(request, config):
-    push_json = request.get_josn()
+    push_json = request.josn
     push_ref = push_json['ref']
     if push_ref == 'refs/heads/master':
         logging.info('Push event recieved from GitHub for ' + push_ref)
@@ -45,7 +45,7 @@ def deploy(request, config):
             push_json['deployments_url'], auth=config['github_deploy_pat'],
             payload=deployment_payload)
         if deployment_r.status_code == 201:
-            deployment_json = deployment_r.json()
+            deployment_json = deployment_r.json
             deployment_url = deployment_json['url']
             logging.info('Pulling from git repository')
             try:
