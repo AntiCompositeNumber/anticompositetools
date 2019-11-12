@@ -44,7 +44,7 @@ def deploy(request, push_json, config):
         deployment_payload = {'ref': push_ref}
         deployment_r = requests.post(
             push_json['repository']['deployments_url'],
-            auth=config['github_deploy_pat'], payload=deployment_payload)
+            auth=config['github_deploy_pat'], params=deployment_payload)
         logging.debug(deployment_r.txt)
         if deployment_r.status_code == 201:
             deployment_json = deployment_r.json
