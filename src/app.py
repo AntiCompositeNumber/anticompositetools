@@ -33,7 +33,8 @@ __dir__ = os.path.dirname(__file__)
 app.config.update(json.load(open(os.path.join(__dir__, 'config.json'))))
 
 rev = subprocess.run(['git', 'rev-parse', '--short', 'HEAD'],
-                     capture_output=True, text=True)
+                     universal_newlines=True, stdout=subprocess.PIPE,
+                     stderr=subprocess.PIPE)
 app.config['version'] = rev.stdout
 
 
