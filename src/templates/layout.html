@@ -24,7 +24,7 @@
       <div class="collapse navbar-collapse" id="navbar">
         <ul class="navbar-nav mr-auto">
           {% macro nav_row(name, label) -%}
-            <li class="nav-item{% if url_for(name) == request.path %} active{% endif %}">
+            <li class="nav-item{% if url_for(name) == request.script.root + request.path %} active{% endif %}">
               <a class="nav-link" href="{{ url_for(name) }}">{{ label }}</a>
             </li>
           {%- endmacro %}
