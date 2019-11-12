@@ -20,6 +20,7 @@
 import logging
 import os
 import json
+import subprocess
 import flask
 import hyphenator
 import deploy
@@ -30,6 +31,10 @@ app = flask.Flask(__name__)
 
 __dir__ = os.path.dirname(__file__)
 app.config.update(json.load(open(os.path.join(__dir__, 'config.json'))))
+
+rev = subprocess.run(['git', 'rev-parse', '--short', 'HEAD'],
+                     capture_output=True, text=True)
+app.config['version'] = rev.stdout
 
 
 @app.route('/')
@@ -42,8 +47,8 @@ def autodeploy():
     if deploy.verify_hmac(flask.request, app.config):
         try:
             deploy_result = deploy.main(flask.request, app.config)
-        except Exception:
-            return 'Exception while deploying', 500
+        except Exception as problem:
+            return 'Exception while deploying:\n' + str(problem), 500
         if deploy_result:
             flask.abort(204)
         else:

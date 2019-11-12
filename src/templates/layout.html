@@ -42,15 +42,19 @@
     </main>
     <footer >
     {% block footer %}
-      <div class="mh-auto p-3 mt-5 text-right position-relative " style="bottom:0; width:100%">
+      <div class="mh-auto p-3 mt-5 text-md-right text-center">
         <hr>
-        <span class="text-muted pr-3">
-          This project is licensed under the <a class="text-reset" href="https://www.apache.org/licenses/LICENSE-2.0">Apache License, version 2.0</a>.
-        </span>
-        <span class="">
-          <a class="btn btn-dark btn-sm" href="https://en.wikipedia.org/wiki/User_talk:AntiCompositeNumber"><i class="fab fa-wikipedia-w"></i> Talk page</a>
-          <a class="btn btn-dark btn-sm" href="https://github.com/AntiCompositeNumber/anticompositetools"><i class="fab fa-github"></i> GitHub</a>
-        </span>
+        <div class="row justify-content-center justify-content-md-end align-items-center">
+          <div class="col-sm mb-3 mb-md-0">
+            <div class="text-muted">This project is licensed under the <a class="text-reset" href="https://www.apache.org/licenses/LICENSE-2.0">Apache&nbspLicense,&nbspversion&nbsp2.0</a>.
+            </div>
+            <div class="text-muted">Repository version <code class="text-reset">{{ config['version'] }}</code></div>
+          </div>
+          <div class="col- mr-md-4">
+            <a class="btn btn-dark btn-sm" href="https://en.wikipedia.org/wiki/User_talk:AntiCompositeNumber"><i class="fab fa-wikipedia-w"></i> Talk page</a>
+            <a class="btn btn-dark btn-sm" href="https://github.com/AntiCompositeNumber/anticompositetools"><i class="fab fa-github"></i> GitHub</a>
+          </div>
+        </div>
       </div>
     {% endblock %}
     </footer>
