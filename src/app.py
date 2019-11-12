@@ -38,7 +38,7 @@ def index():
 
 @app.route('/deploy', methods=['POST'])
 def autodeploy():
-    if deploy.verify_hmac(flask.response, app.config):
+    if deploy.verify_hmac(flask.request, app.config):
         try:
             deploy_result = deploy.main(flask.response, app.config)
         except Exception:
