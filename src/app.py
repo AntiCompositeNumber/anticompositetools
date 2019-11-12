@@ -24,11 +24,12 @@ import flask
 import hyphenator
 import deploy
 
+logging.basicConfig(filename='act.log', level=logging.DEBUG)
+
 app = flask.Flask(__name__)
 
 __dir__ = os.path.dirname(__file__)
 app.config.update(json.load(open(os.path.join(__dir__, 'config.json'))))
-logging.basicConfig(filename='act.log', level=logging.DEBUG)
 
 
 @app.route('/')
@@ -40,7 +41,7 @@ def index():
 def autodeploy():
     if deploy.verify_hmac(flask.request, app.config):
         try:
-            deploy_result = deploy.main(flask.response, app.config)
+            deploy_result = deploy.main(flask.request, app.config)
         except Exception:
             flask.abort(500)
 
