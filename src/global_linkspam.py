@@ -94,18 +94,18 @@ def site_report(pages, site, preload_sums, report_site):
         site.code, preload_sums.get('en')))
     reports = []
 
-    count = len(pages)
+    for page in pages:
+        url = page.full_url()
+        edit_link = url + '?action=edit&summary=' + summary + '&minor=1'
+
+        page_line = dict(page_title=page.title(),
+                         page_link=url, edit_link=edit_link)
+
+        reports.append(page_line)
+
+    count = len(reports)
 
     if count > 0:
-        for page in pages:
-            url = page.full_url()
-            edit_link = url + '?action=edit&summary=' + summary + '&minor=1'
-
-            page_line = dict(page_title=page.title(),
-                             page_link=url, edit_link=edit_link)
-
-            reports.append(page_line)
-
         return {'reports': reports, 'count': count}
     else:
         return {}
@@ -131,9 +131,10 @@ def run_check(site, runOverride):
 
 
 def save_page(new_text):
-    with open('/data/project/anticompositebot/www/static/HijackSpam.html',
+    out_json = json.dumps(new_text, indent=4)
+    with open('output.json',
               'w') as f:
-        f.write(new_text)
+        f.write(out_json)
 
 
 def main():
@@ -170,18 +171,18 @@ def main():
     skipped = []
     site_reports = {}
     for url in sitematrix:
+        print(url)
         try:
             cur_site = pywikibot.Site(url=url + '/wiki/MediaWiki:Delete/en')
         except Exception:
             skipped.append(url)
             continue
-
         pages = list_pages(cur_site, target)
 
         report = site_report(pages, cur_site, preload_sums, enwiki)
 
         if report:
-            site_reports[cur_site.db_name()] = report
+            site_reports[cur_site.dbName()] = report
 
     output['site_reports'] = site_reports
     output['skipped'] = skipped
