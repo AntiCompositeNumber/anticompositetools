@@ -36,6 +36,7 @@ def verify_hmac(request, config):
 def deploy(request, push_json, config):
     logging.info('deploy()')
     logging.debug(push_json)
+    auth = ('AntiCompositeNumber', config['github_deploy_pat'])
     push_ref = push_json['ref']
     if push_ref == 'refs/heads/master':
         logging.info('Push event recieved from GitHub for ' + push_ref)
@@ -44,7 +45,7 @@ def deploy(request, push_json, config):
         deployment_payload = {'ref': push_ref}
         deployment_r = requests.post(
             push_json['repository']['deployments_url'],
-            auth=config['github_deploy_pat'], data=deployment_payload)
+            auth=auth, data=deployment_payload)
         logging.debug(deployment_r.text)
         if deployment_r.status_code == 201:
             deployment_json = deployment_r.json
@@ -61,7 +62,7 @@ def deploy(request, push_json, config):
                 logging.error(str(cpe))
                 new_status = requests.post(deployment_url + '/statuses',
                                            data={'state': 'failure'},
-                                           auth=config['github_deploy_pat'])
+                                           auth=auth)
                 logging.debug(new_status.text)
                 if new_status.status_code == 201:
                     return True
@@ -70,7 +71,7 @@ def deploy(request, push_json, config):
             else:
                 new_status = requests.post(deployment_url + '/statuses',
                                            data={'state': 'success'},
-                                           auth=config['github_deploy_pat'])
+                                           auth=auth)
                 logging.debug(new_status.text)
                 if new_status.status_code == 201:
                     logging.info('Webservice restarting!')
