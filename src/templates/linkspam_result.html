@@ -8,7 +8,7 @@
 {% endblock %}
 {% block content %}
 <h1>Global link report</h1>
-<p>Scanning all public wikis for {{ target }} at {{ start_time }}</p>
+<p>Scanning all public wikis for {{ data['target'] }} at {{ data['start_time'] }}</p>
 
 <div class="container">
     <h2 id="Summary">Summary</h2>
@@ -17,20 +17,20 @@
             <th>Wiki</th>
             <th>Count</th>
         </tr>
-    {% for wiki, count in summary_table %}
+    {% for wiki, count in data['summary_table']['entries']|dictsort(by='value') %}
         <tr>
             <td><a href="#{{ wiki }}">{{ wiki }}</a></td>
             <td>{{ count }}</td>
         </tr>
     {% endfor %}
     </table>
-    <p>Total wikis: {{ total_wikis }}</p>
-    <p>Total pages: {{ total_pages }}</p>
+    <p>Total wikis: {{ data['summary_table']['total_wikis'] }}</p>
+    <p>Total pages: {{ data['summary_table']['total_pages'] }}</p>
 </div>
 
 <div>
     <h2 id="Reports">
-    {% for wiki, count, pages in site_report %}
+    {% for wiki, (count, pages) in data['site_reports']|dictsort() %}
         <div class="container">
             <h3 id="{{ wiki }}">{{ wiki }}: {{ count }}</h3>
             <ul>
@@ -43,7 +43,7 @@
     <div class="container">
         <h3 id="Skipped">Skipped</h3>
         <ul>
-        {% for wiki in skipped %}
+        {% for wiki in data['skipped'] %}
             <li>{{ wiki }}</li>
         </ul>
     </div>

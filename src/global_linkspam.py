@@ -92,21 +92,23 @@ def site_report(pages, site, preload_sums, report_site):
 
     summary = urllib.parse.quote(preload_sums.get(
         site.code, preload_sums.get('en')))
-    wt = ''
-    count = 0
-    for page in pages:
-        count += 1
+    reports = []
 
-        wt += ('<li><a href="{url}">{title}</a> '
-               '(<a href="{url}?action=edit&summary={summary}&minor=1">'
-               'edit</a>)</li>\n').format(
-                   title=page.title(), url=page.full_url(), summary=summary)
+    count = len(pages)
+
     if count > 0:
-        wt = ('<div class="container">'
-              '\n<h3 id="{dbname}">{dbname}: {count}</h3>\n<ul>\n').format(
-            dbname=site.dbName(), count=count) + wt + '</ul>\n</div>\n'
+        for page in pages:
+            url = page.full_url()
+            edit_link = url + '?action=edit&summary=' + summary + '&minor=1'
 
-    return wt, count
+            page_line = dict(page_title=page.title(),
+                             page_link=url, edit_link=edit_link)
+
+            reports.append(page_line)
+
+        return {'reports': reports, 'count': count}
+    else:
+        return {}
 
 
 def summary_table(counts):
@@ -115,8 +117,8 @@ def summary_table(counts):
     entries = {key: value for key, value in counts.items() if value != 0}
     total_pages = sum(entries.values())
     total_wikis = len(entries)
-    
-    return dict(entries=entries, total_pages=total_pages, 
+
+    return dict(entries=entries, total_pages=total_pages,
                 total_wikis=total_wikis)
 
 
@@ -135,9 +137,13 @@ def save_page(new_text):
 
 
 def main():
-    target = 'blackwell-synergy.com'
     counts = {}
     output = {}
+
+    parser = argparse.ArgumentParser(description='Generate global link usage')
+    parser.add_argument(
+        'target', help='Domain, such as "example.com", to search for')
+    target = parser.parse_args().target
 
     # Set up on enwiki, check runpage, and prepare empty report page
     enwiki = pywikibot.Site('en', 'wikipedia')
@@ -155,7 +161,6 @@ def main():
         time.sleep(5)
         sitematrix = get_sitematrix()
 
-
     # Add the start time and target to the output
     output['target'] = target
     output['start_time'] = time.asctime()
@@ -163,6 +168,7 @@ def main():
     # Run through the sitematrix. If pywikibot works on that site, generate
     # a report. Otherwise, add it to the skipped list.
     skipped = []
+    site_reports = {}
     for url in sitematrix:
         try:
             cur_site = pywikibot.Site(url=url + '/wiki/MediaWiki:Delete/en')
@@ -173,18 +179,16 @@ def main():
         pages = list_pages(cur_site, target)
 
         report = site_report(pages, cur_site, preload_sums, enwiki)
-        report_text += report[0]
-        counts[cur_site.dbName()] = report[1]
 
-    report_text += ('\n<div class="container">\n'
-                    '<h3 id="Skipped">Skipped</h3>\n<ul>\n' + skipped +
-                    '</ul>\n</div>\n')
+        if report:
+            site_reports[cur_site.db_name()] = report
 
+    output['site_reports'] = site_reports
+    output['skipped'] = skipped
     # Generate a summary table and stick it at the top
-    report_text = lead_text + summary_table(counts) + report_text + footer
-
+    output['summary_table'] = summary_table(counts)
     # Save the report
-    save_page(report_text)
+    print(output)
 
 
 if __name__ == '__main__':
