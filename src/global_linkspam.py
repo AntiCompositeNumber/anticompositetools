@@ -22,6 +22,7 @@
 import time
 import urllib.parse
 import json
+import argparse
 import requests
 import pywikibot
 from pywikibot import pagegenerators
