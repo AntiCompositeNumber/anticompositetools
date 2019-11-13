@@ -23,13 +23,14 @@
     </div>
     <div>
         <input type="hidden" name="wpSummary" 
-            value="Cleaned up ISBNs using [[toolforge:anticompositetools/hyphenator]] #hyphenator" />
+                             value="Cleaned up {{ count }}ISBN{% if count > 0 %}s{% endif %} using [[toolforge:anticompositetools/hyphenator]] #hyphenator" />
         <input type="hidden" name="wpStarttine" value="{{ start_time }}" />
         <input type="hidden" name="wpEdittime" value="{{ edit_time }}" />
         <input type="hidden" name="wpDiff" value="Show changes"/>
         <input type="hidden" name="wpMinoredit" />
         <input type="hidden" name="wpAutoSummary" value="fakehash" />
-        <input type="hidden" name="wpUltimateParam" value="1" >
+        <input type="hidden" name="wpWatchThis" value="n" />
+        <input type="hidden" name="wpUltimateParam" value="1" />
     </div>
     <div class="button form-group mb-0">
         <button type="submit" class="btn btn-primary "
