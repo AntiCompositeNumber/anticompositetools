@@ -43,6 +43,19 @@ def index():
     return flask.render_template('index.html')
 
 
+@app.route('/linksearch')
+def linksearch():
+    return 'Hello world'
+
+
+@app.route('/linksearch/result')
+def linksearch_result():
+    with open('output.json') as f:
+        data = json.load(f)
+
+    return flask.render_template('linkspam_result.html', data=data)
+
+
 @app.route('/deploy', methods=['POST'])
 def autodeploy():
     request = flask.request

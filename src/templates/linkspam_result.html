@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+{% block title %}Index{% endblock %}
+{% block head %}
+  {{ super() }}
+  <style type="text/css">
+    .important { color: #336699; }
+  </style>
+{% endblock %}
+{% block content %}
+<h1>Global link report</h1>
+<p>Scanning all public wikis for {{ data['target'] }} at {{ data['start_time'] }}</p>
+
+<div class="container">
+    <h2 id="Summary">Summary</h2>
+    <table class="table table-striped table-sm table-bordered">
+        <tr>
+            <th>Wiki</th>
+            <th>Count</th>
+        </tr>
+    {% for wiki, count in data['summary_table']['entries']|dictsort(by='value', reverse=true) %}
+        <tr>
+            <td><a href="#{{ wiki }}">{{ wiki }}</a></td>
+            <td>{{ count }}</td>
+        </tr>
+    {% endfor %}
+    </table>
+    <p>Total wikis: {{ data['summary_table']['total_wikis'] }}</p>
+    <p>Total pages: {{ data['summary_table']['total_pages'] }}</p>
+</div>
+
+<div>
+    <h2 id="Reports">Reports</h2>
+    {% for wiki, report in data['site_reports']|dictsort() %}
+        <div class="container">
+            <h3 id="{{ wiki }}">{{ wiki }}: {{ report['count'] }}</h3>
+            <ul>
+            {% for page in report['reports'] %}
+                <li><a href="{{ page['page_link'] }}">{{ page['page_title'] }}</a> (<a href="{{ page['edit_link'] }}">edit</a>)</li>
+            {% endfor %}
+            </ul>
+        </div>
+    {% endfor %}
+    <div class="container">
+        <h3 id="Skipped">Skipped</h3>
+        <ul>
+        {% for wiki in data['skipped'] %}
+            <li>{{ wiki }}</li>
+        {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

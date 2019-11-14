@@ -22,6 +22,7 @@
 import time
 import urllib.parse
 import json
+import argparse
 import requests
 import pywikibot
 from pywikibot import pagegenerators
@@ -91,44 +92,35 @@ def site_report(pages, site, preload_sums, report_site):
 
     summary = urllib.parse.quote(preload_sums.get(
         site.code, preload_sums.get('en')))
-    wt = ''
-    count = 0
+    reports = []
+
     for page in pages:
-        count += 1
+        url = page.full_url()
+        edit_link = url + '?action=edit&summary=' + summary + '&minor=1'
 
-        wt += ('<li><a href="{url}">{title}</a> '
-               '(<a href="{url}?action=edit&summary={summary}&minor=1">'
-               'edit</a>)</li>\n').format(
-                   title=page.title(), url=page.full_url(), summary=summary)
+        page_line = dict(page_title=page.title(),
+                         page_link=url, edit_link=edit_link)
+
+        if page_line not in reports:
+            reports.append(page_line)
+
+    count = len(reports)
+
     if count > 0:
-        wt = ('<div class="container">'
-              '\n<h3 id="{dbname}">{dbname}: {count}</h3>\n<ul>\n').format(
-            dbname=site.dbName(), count=count) + wt + '</ul>\n</div>\n'
-
-    return wt, count
+        return {'reports': reports, 'count': count}
+    else:
+        return {}
 
 
 def summary_table(counts):
     """Takes a dictionary of dbnames and counts and returns at table"""
 
-    tot = 0
-    total_wikis = 0
-    wt = ('\n<div class="container">\n<h2 id="Summary">Summary</h2>'
-          '\n<table class="table table-striped table-sm table-bordered">'
-          '\n<tr><th>Wiki</th><th>Count</th></tr>')
+    entries = {key: value for key, value in counts.items() if value != 0}
+    total_pages = sum(entries.values())
+    total_wikis = len(entries)
 
-    for wiki, count in sorted(counts.items()):
-        if count > 0:
-            wt += ('\n<tr><td><a href="#{wiki}">{wiki}</a></td>\n'
-                   '<td>{count}</td></tr>').format(wiki=wiki, count=count)
-            tot += count
-            total_wikis += 1
-
-    wt += ('\n</table>\n<p>Total wikis: {total_wikis}</p>\n'
-           '<p>Total pages: {tot}</p>\n</div>\n').format(
-            total_wikis=total_wikis, tot=tot)
-
-    return wt
+    return dict(entries=entries, total_pages=total_pages,
+                total_wikis=total_wikis)
 
 
 def run_check(site, runOverride):
@@ -139,20 +131,24 @@ def run_check(site, runOverride):
         raise pywikibot.UserBlocked
 
 
-def save_page(new_text):
-    with open('/data/project/anticompositebot/www/static/HijackSpam.html',
+def save_page(new_text, target):
+    with open(target + '.json',
               'w') as f:
-        f.write(new_text)
+        json.dump(new_text, f, indent=4)
 
 
 def main():
-    target = 'blackwell-synergy.com'
     counts = {}
+    output = {}
+
+    parser = argparse.ArgumentParser(description='Generate global link usage')
+    parser.add_argument(
+        'target', help='Domain, such as "example.com", to search for')
+    target = parser.parse_args().target
 
     # Set up on enwiki, check runpage, and prepare empty report page
     enwiki = pywikibot.Site('en', 'wikipedia')
     run_check(enwiki, False)
-    report_text = '\n\n<h2 class="container">Reports</h2>\n'
 
     # Load preload summaries from on-wiki json
     config = pywikibot.Page(
@@ -166,58 +162,39 @@ def main():
         time.sleep(5)
         sitematrix = get_sitematrix()
 
-    header = """<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://tools-static.wmflabs.org/cdnjs/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" crossorigin="anonymous">
-
-    <title>HijackSpam</title>
-  </head>
-  <body>
-"""
-
-    footer = """
-    <script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/jquery/3.4.1/jquery.slim.min.js" crossorigin="anonymous"></script>
-    <script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/popper.js/1.15.0/umd/popper.min.js" crossorigin="anonymous"></script>
-    <script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-  </body>
-</html>"""
-
-    # Add the start time to the output
-    lead_text = (header + '<div class="container">\n'
-                 '<h1>HijackSpam</h1>\n<p>Scanning all public wikis for ' +
-                 target + ' at ' + time.asctime() + '.</p>\n</div>\n')
+    # Add the start time and target to the output
+    output['target'] = target
+    output['start_time'] = time.asctime()
 
     # Run through the sitematrix. If pywikibot works on that site, generate
     # a report. Otherwise, add it to the skipped list.
-    skipped = ''
+    skipped = []
+    site_reports = {}
+    letter = ''
     for url in sitematrix:
+        if letter != url[8]:
+            letter = url[8]
+            print('\r' + letter)
+
         try:
             cur_site = pywikibot.Site(url=url + '/wiki/MediaWiki:Delete/en')
         except Exception:
-            skipped += '<li>{url}</li>\n'.format(url=url)
+            skipped.append(url)
             continue
-
         pages = list_pages(cur_site, target)
 
         report = site_report(pages, cur_site, preload_sums, enwiki)
-        report_text += report[0]
-        counts[cur_site.dbName()] = report[1]
 
-    report_text += ('\n<div class="container">\n'
-                    '<h3 id="Skipped">Skipped</h3>\n<ul>\n' + skipped +
-                    '</ul>\n</div>\n')
+        if report:
+            site_reports[cur_site.dbName()] = report
+            counts[cur_site.dbName()] = report['count']
 
+    output['site_reports'] = site_reports
+    output['skipped'] = skipped
     # Generate a summary table and stick it at the top
-    report_text = lead_text + summary_table(counts) + report_text + footer
-
+    output['summary_table'] = summary_table(counts)
     # Save the report
-    save_page(report_text)
+    save_page(output)
 
 
 if __name__ == '__main__':
