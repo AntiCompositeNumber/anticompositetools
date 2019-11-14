@@ -189,7 +189,7 @@ def main():
     # Generate a summary table and stick it at the top
     output['summary_table'] = summary_table(counts)
     # Save the report
-    print(output)
+    save_page(output)
 
 
 if __name__ == '__main__':
