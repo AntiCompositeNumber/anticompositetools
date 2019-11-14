@@ -45,7 +45,10 @@ def index():
 
 @app.route('/linksearch')
 def linksearch():
-    return 'Hello world'
+    with open('linkspam_config.json') as f:
+        data = json.load(f)
+
+    return flask.render_template('linkspam.html', data=data)
 
 
 @app.route('/linksearch/result')
