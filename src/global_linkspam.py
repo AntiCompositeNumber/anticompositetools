@@ -101,7 +101,8 @@ def site_report(pages, site, preload_sums, report_site):
         page_line = dict(page_title=page.title(),
                          page_link=url, edit_link=edit_link)
 
-        reports.append(page_line)
+        if page_line not in reports:
+            reports.append(page_line)
 
     count = len(reports)
 
@@ -130,11 +131,10 @@ def run_check(site, runOverride):
         raise pywikibot.UserBlocked
 
 
-def save_page(new_text):
-    out_json = json.dumps(new_text, indent=4)
-    with open('output.json',
+def save_page(new_text, target):
+    with open(target + '.json',
               'w') as f:
-        f.write(out_json)
+        json.dump(new_text, f, indent=4)
 
 
 def main():
@@ -170,8 +170,12 @@ def main():
     # a report. Otherwise, add it to the skipped list.
     skipped = []
     site_reports = {}
+    letter = ''
     for url in sitematrix:
-        print(url)
+        if letter != url[8]:
+            letter = url[8]
+            print('\r' + letter)
+
         try:
             cur_site = pywikibot.Site(url=url + '/wiki/MediaWiki:Delete/en')
         except Exception:
@@ -183,6 +187,7 @@ def main():
 
         if report:
             site_reports[cur_site.dbName()] = report
+            counts[cur_site.dbName()] = report['count']
 
     output['site_reports'] = site_reports
     output['skipped'] = skipped

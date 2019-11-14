@@ -17,7 +17,7 @@
             <th>Wiki</th>
             <th>Count</th>
         </tr>
-    {% for wiki, count in data['summary_table']['entries']|dictsort(by='value') %}
+    {% for wiki, count in data['summary_table']['entries']|dictsort(by='value', reverse=true) %}
         <tr>
             <td><a href="#{{ wiki }}">{{ wiki }}</a></td>
             <td>{{ count }}</td>
@@ -29,13 +29,13 @@
 </div>
 
 <div>
-    <h2 id="Reports">
-    {% for wiki, (count, pages) in data['site_reports']|dictsort() %}
+    <h2 id="Reports">Reports</h2>
+    {% for wiki, report in data['site_reports']|dictsort() %}
         <div class="container">
-            <h3 id="{{ wiki }}">{{ wiki }}: {{ count }}</h3>
+            <h3 id="{{ wiki }}">{{ wiki }}: {{ report['count'] }}</h3>
             <ul>
-            {% for page_link, page_title, edit_link in pages %}
-                <li><a href="{{ page_link }}">{{ page_title }}</a> (<a href="{{edit_link}}">edit</a>)</li>
+            {% for page in report['reports'] %}
+                <li><a href="{{ page['page_link'] }}">{{ page['page_title'] }}</a> (<a href="{{ page['edit_link'] }}">edit</a>)</li>
             {% endfor %}
             </ul>
         </div>
@@ -45,6 +45,7 @@
         <ul>
         {% for wiki in data['skipped'] %}
             <li>{{ wiki }}</li>
+        {% endfor %}
         </ul>
     </div>
 </div>
