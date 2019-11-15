@@ -8,7 +8,7 @@
 {% endblock %}
 {% block content %}
   <h1>Hyphenator</h1>
-  <p class="important">
+  <div>
     <p>
       This tool will automatically hyphenate ISBNs and 
       convert 10-digit ISBNs to 13-digit ISBNs using <a href=https://arthurdejong.org/python-stdnum/>python-stdnum</a>.
@@ -19,8 +19,9 @@
       and any citation with an <code class="text-reset">|isbn=</code>
       parameter. Magic links are not supported.
     </p>
+  </div>
 
-<form action="{{url_for('hyphenator_output')}}" method="post">
+  <form action="{{url_for('hyphenator_output')}}" method="post">
     <div class="form-group">
         <label for="url">Page URL:</label>
         <input type="url" id="url" name="page_url" / class="form-control">
@@ -28,5 +29,5 @@
     <div class="form-group button">
         <button type="submit" class="btn btn-primary">Submit</button>
     </div>
-</form>
+ </form>
 {% endblock %}

@@ -20,6 +20,7 @@
 """Generates reports for a link cleanup project"""
 
 import time
+from datetime import datetime
 import urllib.parse
 import json
 import argparse
@@ -164,7 +165,7 @@ def main():
 
     # Add the start time and target to the output
     output['target'] = target
-    output['start_time'] = time.asctime()
+    output['start_time'] = datetime.utcnow().isoformat()
 
     # Run through the sitematrix. If pywikibot works on that site, generate
     # a report. Otherwise, add it to the skipped list.

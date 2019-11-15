@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+{% block title %}Linkspam{% endblock %}
+{% block head %}
+  {{ super() }}
+  <style type="text/css">
+    .important { color: #336699; }
+  </style>
+{% endblock %}
+{% block content %}
+  <h1>Linkspam - Submit Job</h1>
+  <div>
+    {% macro card(type, title, text) -%}
+    <div class="card {% if type %}border-{{type}}{% endif %}">
+        <div class="card-body">
+          <h4 class="card-title">{{ title }}</h4>
+          <p class="card-text">{{ text }}</p>
+          {{below}}
+        </div>
+      </div>
+    {%- endmacro %}
+    {% if state == "error" %}
+      {{card('danger', 'Error', 'Your job could not be submitted.')}}
+    {% elif state == "submitted" %}
+      {% set below -%}
+        <div class="progress">
+          <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: {{percent}}%" aria-valuenow="{{percent}}" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+      {%- endset %}
+      {{card('', 'Submitted', 'Your job has been submitted and is being processed.')}}
+    {% elif state == "success" %}
+      {{card('success', 'Success', 'Your job has been completed. View the report')}}
+    {% endif %}
+  </div> 
+
+
+{% endblock %}

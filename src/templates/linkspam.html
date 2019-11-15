@@ -20,9 +20,9 @@
     {% for domain, sitedata in data.items() %} 
       <div class="card">
         <div class="card-body">
-            <h2 class="card-title">{{ sitedata['title'] }}</h2>
-          <p class="card-text">Foo</p>
-          <p><a class="card-link" href="{{url_for('linksearch_result', target=domain)}}" role="button">Run</a></p>
+          <h4 class="card-title">{{ sitedata['title'] }}</h4>
+          <p class="card-text">{{ sitedata['description'] }}</p>
+          <p><a class="card-link btn btn-primary" href="{{url_for('linksearch_result', target=domain)}}" role="button">Run</a></p>
         </div>
         <div class="card-footer">
             <small class="text-muted">Last updated {{ sitedata['last_update'] }}</small>
