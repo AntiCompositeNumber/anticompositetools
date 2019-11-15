@@ -23,7 +23,6 @@ import json
 import subprocess
 import flask
 import hyphenator
-import deploy
 
 logging.basicConfig(filename='act.log', level=logging.DEBUG)
 
@@ -41,48 +40,6 @@ app.config['version'] = rev.stdout
 @app.route('/')
 def index():
     return flask.render_template('index.html')
-
-
-@app.route('/linksearch')
-def linksearch():
-    with open('linkspam_config.json') as f:
-        data = json.load(f)
-
-    return flask.render_template('linkspam.html', data=data)
-
-
-@app.route('/linksearch/job/<state>')
-def linksearch_job(state):
-    percent = flask.request.args.get('percent', '')
-    return flask.render_template('linkspam_submit.html', state=state,
-                                 percent=percent)
-
-
-@app.route('/linksearch/result')
-def linksearch_result():
-    with open('output.json') as f:
-        data = json.load(f)
-
-    return flask.render_template('linkspam_result.html', data=data)
-
-
-@app.route('/deploy', methods=['POST'])
-def autodeploy():
-    request = flask.request
-    logging.debug('Request:' + str(request.__dict__))
-    logging.debug('Request JSON:' + str(request.json))
-    if deploy.verify_hmac(flask.request, app.config):
-        try:
-            deploy_result = deploy.deploy(request, request.json, app.config)
-        except Exception as problem:
-            logging.error(problem)
-            return 'Exception while deploying:\n' + str(problem), 500
-        if deploy_result:
-            flask.abort(204)
-        else:
-            flask.abort(504)
-    else:
-        flask.abort(403)
 
 
 @app.route('/hyphenator', methods=['GET'])
