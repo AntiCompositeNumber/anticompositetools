@@ -20,6 +20,7 @@
 import logging
 import os
 import json
+import datetime
 import subprocess
 import flask
 import hyphenator
@@ -36,6 +37,11 @@ rev = subprocess.run(['git', 'rev-parse', '--short', 'HEAD'],
                      universal_newlines=True, stdout=subprocess.PIPE,
                      stderr=subprocess.PIPE)
 app.config['version'] = rev.stdout
+
+def format_timesince(value):
+    if value:
+        date = datetime.strptime(value, 'YYYY-MM-DDTHH:MM:SS.mmmmmm')
+
 
 
 @app.route('/')
