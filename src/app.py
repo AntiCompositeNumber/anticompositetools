@@ -51,13 +51,9 @@ def hyphenator_form():
 def hyphenator_output():
     if flask.request.method == 'POST':
         pageurl = flask.request.form['page_url']
-
-        if '?' in pageurl:
-            submit_url = pageurl + '&action=submit'
-        else:
-            submit_url = pageurl + '?action=submit'
-            newtext, times, count = hyphenator.main(pageurl)
-
+        newtext, times, count, url = hyphenator.main(pageurl)
+        submit_url = url + '&action=submit'
+        
         return flask.render_template(
                 'hyphenator-output.html', count=count, submit_url=submit_url,
                 newtext=newtext, edit_time=times[0], start_time=times[1])

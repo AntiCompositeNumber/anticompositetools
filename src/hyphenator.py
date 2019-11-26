@@ -18,16 +18,15 @@
 # limitations under the License.
 
 import time
+import urllib.parse
 import requests
 import mwparserfromhell
 from stdnum import isbn
 
 
 def get_wikitext(url):
-    if '?' in url:
-        wikitext_url = url + '&action=raw'
-    else:
-        wikitext_url = url + '?action=raw'
+    wikitext_url = url + '&action=raw'
+    print(wikitext_url)
 
     headers = {'user-agent': 'anticompositetools/hyphenator '
                '(https://tools.wmflabs.org/anticompositetools/hyphenator; '
@@ -43,13 +42,10 @@ def get_wikitext(url):
             continue
         else:
             start_time = time.strftime('%Y%m%d%H%M%S', time.gmtime())
-            break
-
-    timestruct = time.strptime(request.headers['Last-Modified'],
-                               '%a, %d %b %Y %H:%M:%S %Z')
-    edit_time = time.strftime('%Y%m%d%H%M%S', timestruct)
-
-    return (request.text, (edit_time, start_time))
+            timestruct = time.strptime(request.headers['Last-Modified'],
+                                       '%a, %d %b %Y %H:%M:%S %Z')
+            edit_time = time.strftime('%Y%m%d%H%M%S', timestruct)
+            return (request.text, (edit_time, start_time))
 
 
 def find_isbns(code):
@@ -81,11 +77,32 @@ def check_isbn(raw_isbn):
         return True
 
 
-def main(url):
+def get_page_url(url):
+    parsed = urllib.parse.urlparse(url)
+    if parsed.path == '/w/index.php':
+        query_params = urllib.parse.parse_qs(parsed.query)
+        if 'oldid' not in query_params:
+            title = query_params['title'][0]
+        else:
+            raise ValueError  # fix
+    elif '/wiki/' in parsed.path:
+        title = parsed.path[6:]
+    else:
+        raise ValueError  # this one too
+
+    new_url = (parsed.scheme + '://' + parsed.netloc
+               + '/w/index.php?title=' + title)
+    return new_url
+
+
+def main(raw_url):
+    url = get_page_url(raw_url)
     try:
         wikitext, times = get_wikitext(url)
     except Exception as err:
-        return err, ('', ''), 0
+        # return err, ('', ''), 0, ''
+        print(err)
+        raise
 
     code = mwparserfromhell.parse(wikitext)
     count = 0
@@ -98,7 +115,7 @@ def main(url):
             count += 1
             template.add(para, new_isbn)
 
-    return code, times, count
+    return code, times, count, url
 
 
 if __name__ == '__main__':
