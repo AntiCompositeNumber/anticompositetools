@@ -22,6 +22,9 @@ import urllib.parse
 import requests
 import mwparserfromhell
 from stdnum import isbn
+import flask
+
+bp = flask.Blueprint('hyphenator', __name__, url_prefix='/hyphenator')
 
 
 def get_wikitext(url):
@@ -118,5 +121,21 @@ def main(raw_url):
     return code, times, count, url
 
 
-if __name__ == '__main__':
-    main()
+@bp.route('/', methods=['GET'])
+def form():
+    return flask.render_template('hyphenator-form.html')
+
+
+@bp.route('/output', methods=['POST'])
+def output():
+    if flask.request.method == 'POST':
+        pageurl = flask.request.form['page_url']
+        newtext, times, count, url = main(pageurl)
+        submit_url = url + '&action=submit'
+
+        return flask.render_template(
+                'hyphenator-output.html', count=count,
+                submit_url=submit_url, newtext=newtext, edit_time=times[0],
+                start_time=times[1])
+
+
