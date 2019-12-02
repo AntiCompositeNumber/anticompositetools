@@ -22,6 +22,6 @@
 import os
 import sys
 sys.path.append(os.getcwd()[:-4])
-import anticompositetools
+from src import create_app
 
-app = anticompositetools.create_app()
+app = create_app()
