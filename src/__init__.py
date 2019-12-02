@@ -20,6 +20,7 @@
 import logging
 import os
 import json
+import base64
 import subprocess
 import flask
 
@@ -31,7 +32,9 @@ def create_app():
 
     __dir__ = os.path.dirname(__file__)
     app.config.update(json.load(open(os.path.join(__dir__, 'config.json'))))
-
+    app.secret_key = base64.b64decode(app.config['secret_key'])
+    app.config['secret_key'] = None
+    
     rev = subprocess.run(['git', 'rev-parse', '--short', 'HEAD'],
                          universal_newlines=True, stdout=subprocess.PIPE,
                          stderr=subprocess.PIPE)
