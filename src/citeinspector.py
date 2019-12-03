@@ -18,19 +18,37 @@
 # limitations under the License.
 
 import time
-import urllib
+import urllib.parse
+import uuid
+import csv
 import requests
 import mwparserfromhell
-from stdnum import isbn
 import flask
 
 bp = flask.Blueprint('citeinspector', __name__, url_prefix='/citeinspector')
-flash = []
 
 
-def get_wikitext(url):
-    wikitext_url = url + '&action=raw'
+class HandledError(Exception):
+    """Exception that have been flashed already
 
+    Attributes:
+        orig_type -- Original exception type
+        message -- Additional message (optional)
+        """
+    def __init__(self, orig_type, message=None):
+        self.orig_type = orig_type
+        self.message = message
+
+
+def flash(message, category="message"):
+    try:
+        flask.flash(message, category)
+    except RuntimeError:
+        print(category + ':', message)
+
+
+def get_retry(url, method='get', output='object', data=None):
+    """Make a request for a resource and retry if that doesn't work."""
     headers = {'user-agent': 'anticompositetools/citeinspector '
                '(https://tools.wmflabs.org/anticompositetools/citeinspector; '
                'tools.anticompositetools@tools.wmflabs.org) python-requests/'
@@ -38,81 +56,229 @@ def get_wikitext(url):
 
     for i in range(1, 5):
         try:
-            request = requests.get(wikitext_url, headers=headers)
-            request.raise_for_status()
-        except Exception:
-            if request.status_code == 404:
-                flash.append(('That page does not exist.', 'danger'))
+            if method == 'get':
+                response = requests.get(url, headers=headers)
+            elif method == 'post':
+                response = requests.post(url, headers=headers, data=data)
+
+            response.raise_for_status()
+
+            if output == 'json':
+                output_json = response.json()
+
+        except Exception as err:
+            print(err)
+            if response.status_code == 404:
+                if output == 'object':
+                    return response
+                else:
+                    return None
+            elif i == 4:
                 raise
             else:
-                time.sleep(5)
+                time.sleep(5*i)
                 continue
-        else:
-            start_time = time.strftime('%Y%m%d%H%M%S', time.gmtime())
-            timestruct = time.strptime(request.headers['Last-Modified'],
-                                       '%a, %d %b %Y %H:%M:%S %Z')
-            edit_time = time.strftime('%Y%m%d%H%M%S', timestruct)
-            return (request.text, (edit_time, start_time))
+
+    if output == 'json':
+        return output_json
+    elif output == 'object':
+        return response
 
 
-def find_cites(code):
-    for template in code.ifilter_templates():
-        if template.has('isbn', ignore_empty=True):
-            raw_isbn = template.get('isbn').value.strip()
-            para = 'isbn'
-        elif template.has('ISBN', ignore_empty=True):
-            raw_isbn = template.get('ISBN').value.strip()
-            para = 'ISBN'
-        else:
-            continue
+def get_wikitext(url):
+    wikitext_url = url + '&action=raw'
 
-        yield (template, raw_isbn, para)
+    request = get_retry(wikitext_url)
+    if request.status_code == 404:
+        flash('That page does not exist.', 'danger')
+        raise HandledError('404 Client Error')
 
-
-def check_isbn(raw_isbn):
-    """If the ISBN can be worked on, return True"""
-    if len(raw_isbn) == 17 or not isbn.is_valid(raw_isbn):
-        return False
     else:
-        return True
+        start_time = time.strftime('%Y%m%d%H%M%S', time.gmtime())
+        timestruct = time.strptime(request.headers['Last-Modified'],
+                                   '%a, %d %b %Y %H:%M:%S %Z')
+        edit_time = time.strftime('%Y%m%d%H%M%S', timestruct)
+        return (request.text, (edit_time, start_time))
 
 
-def get_page_url(url):
-    parsed = urllib.parse.urlparse(url)
-    if parsed.path == '/w/index.php':
+def get_citoid_template_types():
+    """Loads template to citoid type mapping from wiki"""
+    url = get_page_url(
+        'MediaWiki:Citoid-template-type-map.json') + '&action=raw'
+    template_type_map = get_retry(url=url, output='json')
+    supported_templates = [template for key, template
+                           in template_type_map.items()
+                           if template != 'Citation']
+
+    return template_type_map, supported_templates
+
+
+def find_refs(code, supported_templates):
+    """Find refs in the wikitext"""
+    # Check for <ref> tags with citation templates
+    for tag in code.ifilter_tags(matches="ref"):
+        if tag.contents:
+            # Ignore self-closed, unparsable, and empty tags
+            cite_data, template_name = grab_cite_data(
+                tag.contents.filter_templates()[0], supported_templates)
+            if cite_data is not None:
+                try:
+                    # If the reference is already named, use that.
+                    ref_id = tag.get('name').value
+                except ValueError:
+                    # Otherwise, grab a uuid to use in place of the name
+                    ref_id = uuid.uuid4()
+
+                yield dict(name=str(ref_id), template=template_name,
+                           source='wikitext', location='ref',
+                           wikitext=str(tag), data=cite_data)
+
+    # Check for citation templates elsewhere in the text
+    for template in code.ifilter_templates(recursive=False):
+        cite_data, template_name = grab_cite_data(template,
+                                                  supported_templates)
+        if cite_data is not None:
+            # We could generate a Harvard anchor here, but I don't trust
+            # that to be unique
+            ref_id = uuid.uuid4()
+            yield dict(name=str(ref_id), template=template_name,
+                       source='wikitext', location='text',
+                       wikitext=str(template), data=cite_data)
+
+
+def grab_cite_data(template, supported_templates):
+    """Check for supported templates and extract citation data"""
+    template_name = str(template.name).lower().strip().capitalize()
+
+    if template_name in supported_templates:
+        data = {str(para.name).lower().strip(): str(para.value)
+                for para in template.params}
+        return data, template_name
+    else:
+        return None, None
+
+
+def get_bib_ident(cite_data):
+    """Return the best identifier (ISBN, DOI, PMID, PMCID, or URL)"""
+    data = cite_data['data']
+    return data.get(
+        'isbn', data.get(
+            'pmcid', data.get(
+                'pmid', data.get(
+                    'doi', data.get(
+                        'url')))))
+
+
+def get_parsoid_data(ident):
+    rest_api = 'https://en.wikipedia.org/api/rest_v1/'
+    parsoid_endpoint = 'data/citation/{format}/{query}'.format(
+            format='mediawiki', query=ident)
+
+    url = rest_api + parsoid_endpoint
+    return get_retry(url, output='json')[0]
+
+
+def map_parsoid_to_templates(raw_parsoid_data, wikitext_data,
+                             templatedata_cache, template_type_map):
+    try:
+        parsoid_template = template_type_map[raw_parsoid_data["itemType"]]
+    except KeyError:
+        return None
+
+    try:
+        td_map = templatedata_cache[parsoid_template]
+    except KeyError:
+        td_map = get_TemplateData_map(parsoid_template)
+        templatedata_cache[parsoid_template] = td_map
+
+    def lastnamefirstname(author):
+        if author[0] == "":
+            parsed = list(csv.reader([author[1]], skipinitialspace=True))[0]
+            return parsed[0], parsed[1]
+        else:
+            return author[1], author[0]
+
+    data = {}
+    for key, value in raw_parsoid_data.items():
+        if key == "author":
+            for i, author in enumerate(value):
+                last, first = lastnamefirstname(author)
+                data['last' + str(i + 1)] = last
+                data['first' + str(i + 1)] = first
+
+        elif key == "editor":
+            for i, [first, last] in enumerate(value):
+                last, first = lastnamefirstname(author)
+                data['editor' + str(i + 1) + '-last']
+                data['editor' + str(i + 1) + '-first']
+
+        elif type(value) is str:
+            param = td_map.get(key)
+            if param is not None:
+                data[param] = value
+    return dict(name=wikitext_data['name'], template=parsoid_template,
+                source=raw_parsoid_data.get('source', '[Citoid]')[0],
+                location=wikitext_data['location'], data=data)
+
+
+def get_TemplateData_map(template):
+    mw_api = 'https://en.wikipedia.org/w/api.php'
+    request_body = dict(action='templatedata', format='json',
+                        titles='Template:' + template)
+
+    templatedata = get_retry(mw_api, method='post', output='json',
+                             data=request_body)
+    pages = templatedata['pages']
+    para_map = pages[list(pages)[0]]['maps']['citoid']
+    return para_map
+
+
+def get_page_url(rawinput):
+    """Take the user input and get a suitable URL out of it.
+    If the input is not a URL, assume it's an en.wp page, since only en.wp is
+    supported right now.
+    """
+    parsed = urllib.parse.urlparse(rawinput)
+
+    site = parsed.netloc
+    if 'http' not in parsed.scheme:
+        # Assume page on enwiki
+        title = rawinput
+        site = 'en.wikipedia.org'
+    elif site != 'en.wikipedia.org':
+        flash('Sorry, but only the English Wikipedia is supported right now',
+              'danger')
+        raise ValueError
+    elif parsed.path == '/w/index.php':
         query_params = urllib.parse.parse_qs(parsed.query)
         if 'oldid' not in query_params:
             title = query_params['title'][0]
         else:
-            flash.append(('Invalid URL', 'danger'))
+            flash('Invalid URL', 'danger')
             raise ValueError  # fix
     elif '/wiki/' in parsed.path:
         title = parsed.path[6:]
     else:
-        flash.append(('Invalid URL', 'danger'))
+        flash('Invalid URL', 'danger')
         raise ValueError  # this one too
 
-    new_url = (parsed.scheme + '://' + parsed.netloc
-               + '/w/index.php?title=' + title)
-    return new_url
+    return 'https://' + site + '/w/index.php?title=' + title
 
 
-def main(raw_url):
-    url = get_page_url(raw_url)
+def citeinspector(rawinput):
+    url = get_page_url(rawinput)
     wikitext, times = get_wikitext(url)
+    template_type_map, supported_templates = get_citoid_template_types()
 
+    templatedata_cache = {}
     code = mwparserfromhell.parse(wikitext)
-    count = 0
-    for template, raw_isbn, para in find_isbns(code):
-        if not check_isbn(raw_isbn):
-            continue
-
-        new_isbn = isbn.format(raw_isbn, convert=True)
-        if raw_isbn != new_isbn:
-            count += 1
-            template.add(para, new_isbn)
-
-    return code, times, count, url
+    for old_data in find_refs(code, supported_templates):
+        ident = get_bib_ident(old_data)
+        raw_parsoid_data = get_parsoid_data(ident)
+        parsoid_data = map_parsoid_to_templates(
+            raw_parsoid_data, old_data, templatedata_cache, template_type_map)
+        print(old_data)
+        print(parsoid_data)
 
 
 @bp.route('/', methods=['GET'])
@@ -122,30 +288,4 @@ def form():
 
 @bp.route('/output', methods=['POST'])
 def output():
-    def check_err(messages):
-        for message in messages:
-            if message[1] == 'danger':
-                return True
-        return False
-
-    if flask.request.method == 'POST':
-        pageurl = flask.request.form['page_url']
-        try:
-            newtext, times, count, url = main(pageurl)
-        except Exception as err:
-            if not check_err(flash):
-                flash.append((
-                    'An unhandled {0} exception occurred.'.format(err),
-                    'danger'))
-
-            for message in flash:
-                flask.flash(message[0], message[1])
-
-            return flask.redirect(flask.url_for('hyphenator.form'))
-
-        submit_url = url + '&action=submit'
-
-        return flask.render_template(
-                'hyphenator-output.html', count=count,
-                submit_url=submit_url, newtext=newtext, edit_time=times[0],
-                start_time=times[1])
+    return
