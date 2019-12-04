@@ -186,10 +186,11 @@ def map_parsoid_to_templates(raw_parsoid_data, wikitext_data,
         return None
 
     try:
-        td_map = templatedata_cache[parsoid_template]
+        templatedata = templatedata_cache[parsoid_template]
     except KeyError:
-        td_map = get_TemplateData_map(parsoid_template)
-        templatedata_cache[parsoid_template] = td_map
+        templatedata = get_TemplateData_map(parsoid_template)
+        templatedata_cache[parsoid_template] = templatedata
+    td_map = templatedata['maps']['citoid']
 
     def lastnamefirstname(author):
         if author[0] == "":
@@ -229,8 +230,7 @@ def get_TemplateData_map(template):
     templatedata = get_retry(mw_api, method='post', output='json',
                              data=request_body)
     pages = templatedata['pages']
-    para_map = pages[list(pages)[0]]['maps']['citoid']
-    return para_map
+    return pages[list(pages)[0]]
 
 
 def get_page_url(rawinput):

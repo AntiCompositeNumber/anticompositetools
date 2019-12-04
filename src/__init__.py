@@ -34,7 +34,7 @@ def create_app():
     app.config.update(json.load(open(os.path.join(__dir__, 'config.json'))))
     app.secret_key = base64.b64decode(app.config['secret_key'])
     app.config['secret_key'] = None
-    
+
     rev = subprocess.run(['git', 'rev-parse', '--short', 'HEAD'],
                          universal_newlines=True, stdout=subprocess.PIPE,
                          stderr=subprocess.PIPE)
@@ -46,5 +46,9 @@ def create_app():
     @app.route('/')
     def index():
         return flask.render_template('index.html')
+
+    @app.route('/citeinspector/output')
+    def ci():
+        return flask.render_template('citeinspector-diff.html')
 
     return app

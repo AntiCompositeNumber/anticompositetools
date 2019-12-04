@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+{% block title %}CiteInspector - Result{% endblock %}
+{% block head %}
+  {{ super() }}
+  <style type="text/css">
+    .important { color: #336699; }
+  </style>
+{% endblock %}
+{% block content %}
+<h1>Result</h1>
+<div>
+  <div class="container border rounded shadow-sm p-3">
+    <h5>Ipsum, Lorem. "Dolor Sit Amet"</h5>
+    <div class="row border p-3 mx-1 align-items-center">
+      <div class="col col-sm-auto">
+        <strong>Title</strong>
+      </div>
+      <div class="col form-check form-check-inline justify-content-end border-right pr-2">
+        <label class="form-check-label" for="inlineRadio1">Dolor SitAmet</label>
+        <input class="form-check-input ml-2" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2">
+      </div>
+      <div class="col form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1">
+        <label class="form-check-label" for="inlineRadio1">Dolor Sit Amet</label>
+      </div>
+      <div class="col text-right col-sm-auto">
+        <h5 class="mb-0"><span class="badge badge-primary">80%</span></h5>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
