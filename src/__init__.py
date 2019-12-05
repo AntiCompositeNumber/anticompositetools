@@ -40,15 +40,12 @@ def create_app():
                          stderr=subprocess.PIPE)
     app.config['version'] = rev.stdout
 
-    from . import hyphenator
+    from . import hyphenator, citeinspector
     app.register_blueprint(hyphenator.bp)
+    app.register_blueprint(citeinspector.bp)
 
     @app.route('/')
     def index():
         return flask.render_template('index.html')
-
-    @app.route('/citeinspector/output')
-    def ci():
-        return flask.render_template('citeinspector-diff.html')
 
     return app

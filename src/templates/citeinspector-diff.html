@@ -9,24 +9,38 @@
 {% block content %}
 <h1>Result</h1>
 <div>
-  <div class="container border rounded shadow-sm p-3">
-    <h5>Ipsum, Lorem. "Dolor Sit Amet"</h5>
-    <div class="row border p-3 mx-1 align-items-center">
-      <div class="col col-sm-auto">
-        <strong>Title</strong>
-      </div>
-      <div class="col form-check form-check-inline justify-content-end border-right pr-2">
-        <label class="form-check-label" for="inlineRadio1">Dolor SitAmet</label>
-        <input class="form-check-input ml-2" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2">
-      </div>
-      <div class="col form-check form-check-inline">
-        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1">
-        <label class="form-check-label" for="inlineRadio1">Dolor Sit Amet</label>
-      </div>
-      <div class="col text-right col-sm-auto">
-        <h5 class="mb-0"><span class="badge badge-primary">80%</span></h5>
-      </div>
-    </div>
+  {% for cite in d %}
+  <div class="container border rounded shadow-sm p-3 mb-3" id={{cite['name']}}>
+    <h5>{{cite['data']['title']['wikitext']}}</h5>
+    <table class="table table-hover align-content-center">
+      <thead>
+        <tr>
+          <th scope="col">Para</th>
+          <th scope="col">Wikitext</th>
+          <th scope="col">{{cite['citoid_source']}}</th>
+          <th scope="col">Match</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for para, paradata in cite['data'].items() %}
+        <tr class="">
+          <th scope="row">{{para}}</th>
+          <td class="text-right m-0"><span class="form-check form-check-inline">
+            <label class="form-check-label" for="inlineRadio1">{{paradata['wikitext']}}</label>
+            <input class="form-check-input ml-2" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2">
+          </span></td>
+          <td class="m-0"><span class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1">
+            <label class="form-check-label" for="inlineRadio1">{{paradata['citoid']}}</label>
+          </span></td>
+          <td class="text-right col-sm-auto">
+            <h5 class="mb-0"><span class="badge badge-primary">{{paradata['ratio']}}%</span></h5>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
   </div>
+  {% endfor %}
 </div>
 {% endblock %}

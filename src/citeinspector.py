@@ -24,6 +24,7 @@ import csv
 import requests
 import mwparserfromhell
 import flask
+from fuzzywuzzy import fuzz
 
 bp = flask.Blueprint('citeinspector', __name__, url_prefix='/citeinspector')
 
@@ -233,6 +234,49 @@ def get_TemplateData_map(template):
     return pages[list(pages)[0]]
 
 
+def concat_items(wikitext_data, citoid_data):
+    cite = {}
+    wt_citedata = wikitext_data['data']
+    ct_citedata = citoid_data['data']
+    cite['name'] = wikitext_data['name']
+    if wikitext_data['template'] == citoid_data['template']:
+        cite['template'] = [wikitext_data['template'], citoid_data['template']]
+    cite['citoid_source'] = citoid_data['source']
+    cite['location'] = wikitext_data['location']
+    cite['ratio'] = fuzz_set(wt_citedata.values(), ct_citedata.values())
+    cite['data'] = {}
+
+    keys = list(ct_citedata)
+    for key in wt_citedata:
+        if key not in keys:
+            keys.append(key)
+
+    for key in keys:
+        wt_value = wt_citedata.get(key, '')
+        ct_value = ct_citedata.get(key, '')
+        cite['data'][key] = {
+            'wikitext': wt_value,
+            'citoid': ct_value,
+            'ratio': fuzz_item(wt_value, ct_value)
+            }
+
+    return cite
+
+
+def fuzz_item(item_a, item_b):
+    return fuzz.partial_ratio(item_a, item_b)
+
+
+def fuzz_set(set_a, set_b):
+    str_a = ''
+    str_b = ''
+    for item in set_a:
+        str_a += item + ' '
+    for item in set_b:
+        str_b += item + ' '
+    return fuzz.token_set_ratio(str_a, str_b)
+
+
 def get_page_url(rawinput):
     """Take the user input and get a suitable URL out of it.
     If the input is not a URL, assume it's an en.wp page, since only en.wp is
@@ -271,21 +315,27 @@ def citeinspector(rawinput):
     template_type_map, supported_templates = get_citoid_template_types()
 
     templatedata_cache = {}
+    output = []
     code = mwparserfromhell.parse(wikitext)
+
     for old_data in find_refs(code, supported_templates):
         ident = get_bib_ident(old_data)
         raw_parsoid_data = get_parsoid_data(ident)
         parsoid_data = map_parsoid_to_templates(
             raw_parsoid_data, old_data, templatedata_cache, template_type_map)
-        print(old_data)
-        print(parsoid_data)
+        citedata = concat_items(old_data, parsoid_data)
+        output.append(citedata)
+
+    return output
 
 
 @bp.route('/', methods=['GET'])
 def form():
-    return flask.render_template('hyphenator-form.html')
+    return flask.render_template('citeinspector.html')
 
 
 @bp.route('/output', methods=['POST'])
 def output():
-    return
+    pageurl = flask.request.form['page_url']
+    output = citeinspector(pageurl)
+    return flask.render_template('citeinspector-diff.html', d=output)
