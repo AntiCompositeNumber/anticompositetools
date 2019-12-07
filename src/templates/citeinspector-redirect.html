@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block title %}CiteInspector{% endblock %}
+{% block head %}
+  {{ super() }}
+  <style type="text/css">
+    .important { color: #336699; }
+  </style>
+{% endblock %}
+{% block content %}
+<h1>Finished...</h1>
+
+<form action="{{ submit_url }}" method="post" target="_blank" class="pt-2">
+  <textarea id="wpTextbox1" name="wpTextbox1" 
+            class="form-control text-monospace d-n" cols=80 rows=20 
+            spellcheck="false">{{ newtext }}</textarea>
+  <input type="hidden" name="wpSummary" 
+         value="References edited with [[toolforge:anticompositetools/citeinspector|CiteInspector]] Beta #citeinspector" />
+  <input type="hidden" name="wpStarttine" value="{{ start_time }}" />
+  <input type="hidden" name="wpEdittime" value="{{ edit_time }}" />
+  <input type="hidden" name="wpDiff" value="Show changes"/>
+  <input type="hidden" name="wpMinoredit" />
+  <input type="hidden" name="wpAutoSummary" value="fakehash" />
+  <input type="hidden" name="wpWatchthis" value="n" />
+  <input type="hidden" name="wpUltimateParam" value="1" />
+  <button type="submit" class="btn btn-primary">Preview/save</button>
+</form>
+{% endblock %}

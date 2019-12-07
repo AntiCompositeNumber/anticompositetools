@@ -118,7 +118,7 @@ def find_refs(code, supported_templates):
     """Find refs in the wikitext"""
     # Check for <ref> tags with citation templates
     for tag in code.ifilter_tags(matches="ref"):
-        if tag.contents:
+        if tag.contents.filter_templates():
             # Ignore self-closed, unparsable, and empty tags
             cite_data, template_name = grab_cite_data(
                 tag.contents.filter_templates()[0], supported_templates)
@@ -173,10 +173,14 @@ def get_bib_ident(cite_data):
 def get_parsoid_data(ident):
     rest_api = 'https://en.wikipedia.org/api/rest_v1/'
     parsoid_endpoint = 'data/citation/{format}/{query}'.format(
-            format='mediawiki', query=ident)
+            format='mediawiki', query=urllib.parse.quote_plus(ident))
 
     url = rest_api + parsoid_endpoint
-    return get_retry(url, output='json')[0]
+    data = get_retry(url, output='json')
+    if data is not None:
+        return data[0]
+    else:
+        return None
 
 
 def map_parsoid_to_templates(raw_parsoid_data, wikitext_data,
@@ -260,6 +264,8 @@ def concat_items(wikitext_data, citoid_data):
             'ratio': fuzz_item(wt_value, ct_value)
             }
 
+    cite['wikitext'] = wikitext_data['wikitext']
+
     return cite
 
 
@@ -309,24 +315,30 @@ def get_page_url(rawinput):
     return 'https://' + site + '/w/index.php?title=' + title
 
 
-def citeinspector(rawinput):
-    url = get_page_url(rawinput)
+def citeinspector(url):
     wikitext, times = get_wikitext(url)
     template_type_map, supported_templates = get_citoid_template_types()
 
     templatedata_cache = {}
-    output = []
+    output = {}
     code = mwparserfromhell.parse(wikitext)
 
     for old_data in find_refs(code, supported_templates):
         ident = get_bib_ident(old_data)
         raw_parsoid_data = get_parsoid_data(ident)
-        parsoid_data = map_parsoid_to_templates(
-            raw_parsoid_data, old_data, templatedata_cache, template_type_map)
+        if raw_parsoid_data is not None:
+            parsoid_data = map_parsoid_to_templates(
+                raw_parsoid_data, old_data, templatedata_cache,
+                template_type_map)
+        else:
+            continue
         citedata = concat_items(old_data, parsoid_data)
-        output.append(citedata)
+        output[old_data['name']] = citedata
 
-    return output
+    output['_start_time'] = times[1]
+    output['_edit_time'] = times[0]
+
+    return output, wikitext
 
 
 @bp.route('/', methods=['GET'])
@@ -336,6 +348,49 @@ def form():
 
 @bp.route('/output', methods=['POST'])
 def output():
-    pageurl = flask.request.form['page_url']
-    output = citeinspector(pageurl)
-    return flask.render_template('citeinspector-diff.html', d=output)
+    rawinput = flask.request.form['page_url']
+    url = get_page_url(rawinput)
+    output, wikitext = citeinspector(url)
+    output['_url'] = url
+    return flask.render_template('citeinspector-diff.html', d=output,
+                                 wikitext=wikitext)
+
+
+@bp.route('/concat', methods=['POST'])
+def concat():
+    data = flask.json.loads(flask.request.form['data'])
+    wikitext = flask.request.form['wikitext']
+    code = mwparserfromhell.parse(wikitext)
+    changes = {}
+    for key, value in flask.request.form.items():
+        if key == 'wikitext' or key == 'data' or value == '':
+            continue
+        cite_id, sep, para = key.rpartition('/')
+        if sep != '/':
+            continue
+        else:
+            if cite_id not in changes:
+                changes[cite_id] = {}
+            changes[cite_id][para] = value
+
+    for cite_id, cite_data in changes.items():
+        print(code)
+        cite_obj = code.filter(matches=data[cite_id]['wikitext'])
+        for obj in cite_obj:
+            if obj != data[cite_id]['wikitext']:
+                continue
+            elif type(obj) == mwparserfromhell.nodes.tag.Tag:
+                cite_template = obj.contents.filter_templates()[0]
+            elif type(obj) == mwparserfromhell.nodes.template.Template:
+                cite_template = obj
+
+            for para, value in cite_data.items():
+                print(cite_template)
+                cite_template.add(para, value)
+                print(cite_template)
+
+    submit_url = data['_url'] + '&action=submit'
+    return flask.render_template('citeinspector-redirect.html',
+                                 submit_url=submit_url, newtext=str(code),
+                                 start_time=data['_start_time'],
+                                 edit_time=data['_edit_time'])

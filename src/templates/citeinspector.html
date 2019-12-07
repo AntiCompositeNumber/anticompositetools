@@ -7,10 +7,10 @@
   </style>
 {% endblock %}
 {% block content %}
-  <h1>CiteInspector</h1>
+  <h1>CiteInspector <span class="badge badge-info">Beta</span></h1>
   <div>
     <p>This tool compares existing citations to metadata from Citoid.</p>
-    <p>It only works on the English Wikipedia right now.</p>
+    <p>It only works on the English Wikipedia right now, and I fully expect there to be issues. Please check your edits carefully before saving, and report any issues you have (<a href="https://github.com/AntiCompositeNumber/anticompositetools/milestone/1">GitHub</a> works best). </p>
   </div>
 
   <form action="{{url_for('citeinspector.output')}}" method="post">

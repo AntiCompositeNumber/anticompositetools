@@ -9,8 +9,9 @@
 {% block content %}
 <h1>Result</h1>
 <div>
-  {% for cite in d %}
-  <div class="container border rounded shadow-sm p-3 mb-3" id={{cite['name']}}>
+  <form action="{{url_for('citeinspector.concat')}}" method="post">
+  {% for name, cite in d.items() if not name.startswith('_') %}
+  <div class="container border rounded shadow-sm p-3 mb-3" id={{name}}>
     <h5>{{cite['data']['title']['wikitext']}}</h5>
     <table class="table table-hover align-content-center">
       <thead>
@@ -26,12 +27,12 @@
         <tr class="">
           <th scope="row">{{para}}</th>
           <td class="text-right m-0"><span class="form-check form-check-inline">
-            <label class="form-check-label" for="inlineRadio1">{{paradata['wikitext']}}</label>
-            <input class="form-check-input ml-2" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2">
+            <label class="form-check-label" for="{{name}}/{{para}}/wt">{{paradata['wikitext']}}</label>
+            <input class="form-check-input ml-2" type="radio" name="{{name}}/{{para}}" id="{{cite['name']}}/{{para}}/wt" value="{{paradata['wikitext']}}" checked>
           </span></td>
           <td class="m-0"><span class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1">
-            <label class="form-check-label" for="inlineRadio1">{{paradata['citoid']}}</label>
+            <input class="form-check-input" type="radio" name="{{name}}/{{para}}" id="{{cite['name']}}/{{para}}/ct" value="{{paradata['citoid']}}">
+            <label class="form-check-label" for="{{name}}/{{para}}/ct">{{paradata['citoid']}}</label>
           </span></td>
           <td class="text-right col-sm-auto">
             <h5 class="mb-0"><span class="badge badge-primary">{{paradata['ratio']}}%</span></h5>
@@ -42,5 +43,9 @@
     </table>
   </div>
   {% endfor %}
+  <textarea class="d-none" name='wikitext'>{{wikitext}}</textarea>
+  <textarea class="d-none" name='data'>{{d|tojson}}</textarea>
+  <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
 </div>
 {% endblock %}
