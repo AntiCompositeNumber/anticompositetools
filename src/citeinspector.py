@@ -200,7 +200,10 @@ def map_parsoid_to_templates(raw_parsoid_data, wikitext_data,
     def lastnamefirstname(author):
         if author[0] == "":
             parsed = list(csv.reader([author[1]], skipinitialspace=True))[0]
-            return parsed[0], parsed[1]
+            if len(parsed) == 2:
+                return parsed[0], parsed[1]
+            else:
+                return author
         else:
             return author[1], author[0]
 
@@ -325,7 +328,8 @@ def citeinspector(url):
 
     for old_data in find_refs(code, supported_templates):
         ident = get_bib_ident(old_data)
-        raw_parsoid_data = get_parsoid_data(ident)
+        if ident:
+            raw_parsoid_data = get_parsoid_data(ident)
         if raw_parsoid_data is not None:
             parsoid_data = map_parsoid_to_templates(
                 raw_parsoid_data, old_data, templatedata_cache,
