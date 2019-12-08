@@ -48,7 +48,7 @@ def flash(message, category="message"):
         print(category + ':', message)
 
 
-def get_retry(url, method='get', output='object', data=None):
+def get_retry(url, session, method='get', output='object', data=None):
     """Make a request for a resource and retry if that doesn't work."""
     headers = {'user-agent': 'anticompositetools/citeinspector '
                '(https://tools.wmflabs.org/anticompositetools/citeinspector; '
@@ -58,9 +58,9 @@ def get_retry(url, method='get', output='object', data=None):
     for i in range(1, 5):
         try:
             if method == 'get':
-                response = requests.get(url, headers=headers)
+                response = session.get(url, headers=headers)
             elif method == 'post':
-                response = requests.post(url, headers=headers, data=data)
+                response = session.post(url, headers=headers, data=data)
 
             response.raise_for_status()
 
@@ -79,6 +79,8 @@ def get_retry(url, method='get', output='object', data=None):
             else:
                 time.sleep(5*i)
                 continue
+        else:
+            break
 
     if output == 'json':
         return output_json
@@ -86,10 +88,10 @@ def get_retry(url, method='get', output='object', data=None):
         return response
 
 
-def get_wikitext(url):
+def get_wikitext(url, session):
     wikitext_url = url + '&action=raw'
 
-    request = get_retry(wikitext_url)
+    request = get_retry(wikitext_url, session)
     if request.status_code == 404:
         flash('That page does not exist.', 'danger')
         raise HandledError('404 Client Error')
@@ -102,11 +104,11 @@ def get_wikitext(url):
         return (request.text, (edit_time, start_time))
 
 
-def get_citoid_template_types():
+def get_citoid_template_types(session):
     """Loads template to citoid type mapping from wiki"""
     url = get_page_url(
         'MediaWiki:Citoid-template-type-map.json') + '&action=raw'
-    template_type_map = get_retry(url=url, output='json')
+    template_type_map = get_retry(url=url, session=session, output='json')
     supported_templates = [template for key, template
                            in template_type_map.items()
                            if template != 'Citation']
@@ -170,13 +172,13 @@ def get_bib_ident(cite_data):
                         'url')))))
 
 
-def get_parsoid_data(ident):
+def get_parsoid_data(ident, session):
     rest_api = 'https://en.wikipedia.org/api/rest_v1/'
     parsoid_endpoint = 'data/citation/{format}/{query}'.format(
             format='mediawiki', query=urllib.parse.quote_plus(ident))
 
     url = rest_api + parsoid_endpoint
-    data = get_retry(url, output='json')
+    data = get_retry(url, session, output='json')
     if data is not None:
         return data[0]
     else:
@@ -184,7 +186,7 @@ def get_parsoid_data(ident):
 
 
 def map_parsoid_to_templates(raw_parsoid_data, wikitext_data,
-                             templatedata_cache, template_type_map):
+                             templatedata_cache, template_type_map, session):
     try:
         parsoid_template = template_type_map[raw_parsoid_data["itemType"]]
     except KeyError:
@@ -193,7 +195,7 @@ def map_parsoid_to_templates(raw_parsoid_data, wikitext_data,
     try:
         templatedata = templatedata_cache[parsoid_template]
     except KeyError:
-        templatedata = get_TemplateData_map(parsoid_template)
+        templatedata = get_TemplateData_map(parsoid_template, session)
         templatedata_cache[parsoid_template] = templatedata
     td_map = templatedata['maps']['citoid']
 
@@ -230,12 +232,12 @@ def map_parsoid_to_templates(raw_parsoid_data, wikitext_data,
                 location=wikitext_data['location'], data=data)
 
 
-def get_TemplateData_map(template):
+def get_TemplateData_map(template, session):
     mw_api = 'https://en.wikipedia.org/w/api.php'
     request_body = dict(action='templatedata', format='json',
                         titles='Template:' + template)
 
-    templatedata = get_retry(mw_api, method='post', output='json',
+    templatedata = get_retry(mw_api, session, method='post', output='json',
                              data=request_body)
     pages = templatedata['pages']
     return pages[list(pages)[0]]
@@ -319,8 +321,9 @@ def get_page_url(rawinput):
 
 
 def citeinspector(url):
-    wikitext, times = get_wikitext(url)
-    template_type_map, supported_templates = get_citoid_template_types()
+    session = requests.Session()
+    wikitext, times = get_wikitext(url, session)
+    template_type_map, supported_templates = get_citoid_template_types(session)
 
     templatedata_cache = {}
     output = {}
@@ -329,11 +332,14 @@ def citeinspector(url):
     for old_data in find_refs(code, supported_templates):
         ident = get_bib_ident(old_data)
         if ident:
-            raw_parsoid_data = get_parsoid_data(ident)
+            raw_parsoid_data = get_parsoid_data(ident, session)
+        else:
+            continue
+
         if raw_parsoid_data is not None:
             parsoid_data = map_parsoid_to_templates(
                 raw_parsoid_data, old_data, templatedata_cache,
-                template_type_map)
+                template_type_map, session)
         else:
             continue
         citedata = concat_items(old_data, parsoid_data)
@@ -341,6 +347,7 @@ def citeinspector(url):
 
     output['_start_time'] = times[1]
     output['_edit_time'] = times[0]
+    session.close()
 
     return output, wikitext
 
