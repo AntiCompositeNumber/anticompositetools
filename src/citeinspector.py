@@ -327,6 +327,7 @@ def citeinspector(url):
 
     templatedata_cache = {}
     output = {}
+    meta = {}
     code = mwparserfromhell.parse(wikitext)
 
     for old_data in find_refs(code, supported_templates):
@@ -345,11 +346,11 @@ def citeinspector(url):
         citedata = concat_items(old_data, parsoid_data)
         output[old_data['name']] = citedata
 
-    output['_start_time'] = times[1]
-    output['_edit_time'] = times[0]
+    meta['start_time'] = times[1]
+    meta['edit_time'] = times[0]
     session.close()
 
-    return output, wikitext
+    return output, wikitext, meta
 
 
 @bp.route('/', methods=['GET'])
@@ -361,20 +362,21 @@ def form():
 def output():
     rawinput = flask.request.form['page_url']
     url = get_page_url(rawinput)
-    output, wikitext = citeinspector(url)
-    output['_url'] = url
+    output, wikitext, meta = citeinspector(url)
+    meta['url'] = url
     return flask.render_template('citeinspector-diff.html', d=output,
-                                 wikitext=wikitext)
+                                 wikitext=wikitext, meta=meta)
 
 
 @bp.route('/concat', methods=['POST'])
 def concat():
     data = flask.json.loads(flask.request.form['data'])
+    meta = flask.json.loads(flask.request.form['meta'])
     wikitext = flask.request.form['wikitext']
     code = mwparserfromhell.parse(wikitext)
     changes = {}
     for key, value in flask.request.form.items():
-        if key == 'wikitext' or key == 'data' or value == '':
+        if key in ['wikitext', 'data', 'meta'] or value == '':
             continue
         cite_id, sep, para = key.rpartition('/')
         if sep != '/':
@@ -400,8 +402,8 @@ def concat():
                 cite_template.add(para, value)
                 print(cite_template)
 
-    submit_url = data['_url'] + '&action=submit'
+    submit_url = meta['url'] + '&action=submit'
     return flask.render_template('citeinspector-redirect.html',
                                  submit_url=submit_url, newtext=str(code),
-                                 start_time=data['_start_time'],
-                                 edit_time=data['_edit_time'])
+                                 start_time=meta['start_time'],
+                                 edit_time=meta['edit_time'])

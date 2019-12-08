@@ -10,7 +10,7 @@
 <h1>Result</h1>
 <div>
   <form action="{{url_for('citeinspector.concat')}}" method="post">
-  {% for name, cite in d.items() if not name.startswith('_') %}
+  {% for name, cite in d.items() %}
   <div class="container border rounded shadow-sm p-3 mb-3" id={{name}}>
       <h5>{{cite['data']['title']['wikitext']}} <span class="badge badge-primary text-align-right">{{cite['ratio']}} %</span></h5>
     <table class="table table-hover align-content-center">
@@ -45,6 +45,7 @@
   {% endfor %}
   <textarea class="d-none" name='wikitext'>{{wikitext}}</textarea>
   <textarea class="d-none" name='data'>{{d|tojson}}</textarea>
+  <textarea class="d-none" name='meta'>{{meta|tojson}}</textarea>
   <button type="submit" class="btn btn-primary">Submit</button>
   </form>
 </div>
