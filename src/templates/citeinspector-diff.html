@@ -10,7 +10,7 @@
 <h1>Result</h1>
 <div>
   <form action="{{url_for('citeinspector.concat')}}" method="post">
-  {% for name, cite in d.items() %}
+  {% for name, cite in d.items()|sort(attribute='1.ratio') %}
   <div class="container border rounded shadow-sm p-3 mb-3" id={{name}}>
       <h5>{{cite['data']['title']['wikitext']}} <span class="badge badge-primary text-align-right">{{cite['ratio']}} %</span></h5>
     <table class="table table-hover align-content-center">
@@ -23,7 +23,7 @@
         </tr>
       </thead>
       <tbody>
-      {% for para, paradata in cite['data'].items() %}
+      {% for para, paradata in cite['data'].items()|sort(attribute='1.ratio') %}
         <tr class="">
           <th scope="row">{{para}}</th>
           <td class="text-right m-0"><span class="form-check form-check-inline">
