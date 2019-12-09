@@ -204,29 +204,27 @@ def map_parsoid_to_templates(raw_parsoid_data, wikitext_data,
         templatedata_cache[parsoid_template] = templatedata
     td_map = templatedata['maps']['citoid']
 
-    def lastnamefirstname(author):
-        if author[0] == "":
-            parsed = list(csv.reader([author[1]], skipinitialspace=True))[0]
-            if len(parsed) == 2:
-                return parsed[0], parsed[1]
-            else:
-                return author
-        else:
-            return author[1], author[0]
-
     data = {}
     for key, value in raw_parsoid_data.items():
         if key == "author":
             for i, author in enumerate(value):
+                if i == 0:
+                    ordinal = ''
+                else:
+                    ordinal = str(i + 1)
                 last, first = lastnamefirstname(author)
-                data['last' + str(i + 1)] = last
-                data['first' + str(i + 1)] = first
+                data['last' + ordinal] = last
+                data['first' + ordinal] = first
 
         elif key == "editor":
-            for i, [first, last] in enumerate(value):
+            for i, author in enumerate(value):
                 last, first = lastnamefirstname(author)
-                data['editor' + str(i + 1) + '-last']
-                data['editor' + str(i + 1) + '-first']
+                if i == 0:
+                    ordinal = ''
+                else:
+                    ordinal = str(i + 1)
+                data['editor' + ordinal + '-last'] = last
+                data['editor' + ordinal + '-first'] = first
 
         elif type(value) is str:
             param = td_map.get(key)
@@ -235,6 +233,17 @@ def map_parsoid_to_templates(raw_parsoid_data, wikitext_data,
     return dict(name=wikitext_data['name'], template=parsoid_template,
                 source=raw_parsoid_data.get('source', '[Citoid]')[0],
                 location=wikitext_data['location'], data=data)
+
+
+def lastnamefirstname(author):
+    if author[0] == "":
+        parsed = list(csv.reader([author[1]], skipinitialspace=True))[0]
+        if len(parsed) >= 2:
+            return parsed[0], parsed[1]
+        else:
+            return author
+    else:
+        return author[1], author[0]
 
 
 def get_TemplateData_map(template, session):
