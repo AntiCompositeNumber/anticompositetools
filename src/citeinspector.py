@@ -348,7 +348,7 @@ def citeinspector(url):
     for old_data in find_refs(code, supported_templates):
         ident = get_bib_ident(old_data)
         if ident:
-            raw_parsoid_data = get_parsoid_data(ident, session)
+            raw_parsoid_data = get_parsoid_data(ident.strip(), session)
         else:
             continue
 
