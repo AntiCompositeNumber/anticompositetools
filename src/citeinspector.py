@@ -21,6 +21,7 @@ import time
 import urllib.parse
 import uuid
 import csv
+import logging
 import requests
 import mwparserfromhell
 import flask
@@ -322,6 +323,7 @@ def get_page_url(rawinput):
 
 def citeinspector(url):
     session = requests.Session()
+    logging.info('Processing new page: ' + url)
     wikitext, times = get_wikitext(url, session)
     template_type_map, supported_templates = get_citoid_template_types(session)
 
