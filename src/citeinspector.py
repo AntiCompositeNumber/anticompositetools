@@ -70,7 +70,11 @@ def get_retry(url, session, method='get', output='object', data=None):
 
         except Exception as err:
             print(err)
-            if response.status_code == 404:
+            if (
+                    response.status_code == 404 or
+                    response.status_code == 400 or
+                    response.text == 'upstream request timeout'):
+
                 if output == 'object':
                     return response
                 else:
