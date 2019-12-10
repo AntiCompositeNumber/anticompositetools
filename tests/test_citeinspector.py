@@ -52,8 +52,9 @@ def test_get_page_url_w():
 
 
 def test_get_page_url_notitle():
-    input_url = ('https://en.wikipedia.org/w/index.php?'
-                 'title=User:AntiCompositeNumber/test_anticompositetools')
+    input_url = ('https://en.wikipedia.org/w/index.php'
+                 '?title=User:AntiCompositeNumber/test_anticompositetools'
+                 '&diff=930066511&oldid=927923634&diffmode=source')
     with pytest.raises(ValueError):
         citeinspector.get_page_url(input_url)
 
