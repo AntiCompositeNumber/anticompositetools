@@ -135,6 +135,12 @@ def test_find_refs_notemplate():
     assert len(refs) == 0
 
 
+def test_find_refs_wrongtemplate():
+    code = mwph.parse('<ref>{{Example|title=Title}}</ref>')
+    refs = list(citeinspector.find_refs(code, ['Cite book']))
+    assert len(refs) == 0
+
+
 def test_get_bib_ident_isbn():
     data = {'data': {'edition': 'Newition',
                      'isbn': '9781786751041 ',
