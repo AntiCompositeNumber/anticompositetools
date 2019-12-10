@@ -15,3 +15,4 @@ Werkzeug==0.16.0
 pywikibot
 fuzzywuzzy
 python-Levenshtein
+pytest

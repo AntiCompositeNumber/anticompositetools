@@ -213,8 +213,9 @@ def map_parsoid_to_templates(raw_parsoid_data, wikitext_data,
                 else:
                     ordinal = str(i + 1)
                 last, first = lastnamefirstname(author)
-                data['last' + ordinal] = last
-                data['first' + ordinal] = first
+                if last:
+                    data['last' + ordinal] = last
+                    data['first' + ordinal] = first
 
         elif key == "editor":
             for i, author in enumerate(value):
@@ -223,8 +224,9 @@ def map_parsoid_to_templates(raw_parsoid_data, wikitext_data,
                     ordinal = ''
                 else:
                     ordinal = str(i + 1)
-                data['editor' + ordinal + '-last'] = last
-                data['editor' + ordinal + '-first'] = first
+                if last:
+                    data['editor' + ordinal + '-last'] = last
+                    data['editor' + ordinal + '-first'] = first
 
         elif type(value) is str:
             param = td_map.get(key)
@@ -237,11 +239,13 @@ def map_parsoid_to_templates(raw_parsoid_data, wikitext_data,
 
 def lastnamefirstname(author):
     if author[0] == "":
+        if author[1] == "":
+            return None, None
         parsed = list(csv.reader([author[1]], skipinitialspace=True))[0]
         if len(parsed) >= 2:
             return parsed[0], parsed[1]
         else:
-            return author
+            return author[1], ''
     else:
         return author[1], author[0]
 

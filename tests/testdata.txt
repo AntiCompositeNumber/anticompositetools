@@ -1,0 +1,7 @@
+{{ISBN|0486821951}}
+
+<ref>{{cite book |title=Alice's adventures in Wonderland |isbn=9781786751041 |edition=Newition}}</ref>
+
+{{cite book |title=The annotated Huckleberry Finn : Adventures of Huckleberry Finn (Tom Sawyer's comrade) |publisher=Norton |ISBN=9780393020397}}
+
+{{ISBNT|1402714602}}
