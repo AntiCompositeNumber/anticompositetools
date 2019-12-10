@@ -206,7 +206,7 @@ def test_get_parsoid_data_isbn():
 
 def test_get_parsoid_data_invalid_ident():
     s = requests.Session()
-    ident = 'Test'
+    ident = 'DefinitelyLegitimateReference'
     data = citeinspector.get_parsoid_data(ident, s)
     assert data is None
 
