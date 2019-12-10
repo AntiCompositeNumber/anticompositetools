@@ -26,11 +26,42 @@ sys.path.append(os.path.realpath(os.path.dirname(__file__)+"/.."))
 import src.citeinspector as citeinspector  # noqa: E402
 
 
-def test_get_page_url():
+def test_get_page_url_page():
     page = 'User:AntiCompositeNumber/test_anticompositetools'
     url = ('https://en.wikipedia.org/w/index.php?'
            'title=User:AntiCompositeNumber/test_anticompositetools')
     assert citeinspector.get_page_url(page) == url
+
+
+def test_get_page_url_wiki():
+    input_url = ('https://en.wikipedia.org/wiki/'
+                 'User:AntiCompositeNumber/test_anticompositetools')
+    url = ('https://en.wikipedia.org/w/index.php?'
+           'title=User:AntiCompositeNumber/test_anticompositetools')
+
+    assert citeinspector.get_page_url(input_url) == url
+
+
+def test_get_page_url_w():
+    input_url = ('https://en.wikipedia.org/w/index.php?'
+                 'title=User:AntiCompositeNumber/test_anticompositetools')
+    url = ('https://en.wikipedia.org/w/index.php?'
+           'title=User:AntiCompositeNumber/test_anticompositetools')
+
+    assert citeinspector.get_page_url(input_url) == url
+
+
+def test_get_page_url_notitle():
+    input_url = ('https://en.wikipedia.org/w/index.php?'
+                 'title=User:AntiCompositeNumber/test_anticompositetools')
+    with pytest.raises(ValueError):
+        citeinspector.get_page_url(input_url)
+
+
+def test_get_page_url_nonwiki():
+    input_url = 'http://example.com'
+    with pytest.raises(ValueError):
+        citeinspector.get_page_url(input_url)
 
 
 def test_get_wikitext():
@@ -132,3 +163,14 @@ def test_lastnamefirstname_one():
     last, first = citeinspector.lastnamefirstname(author)
     assert not first
     assert last == 'Jimbo'
+
+
+def test_fuzz_item():
+    assert citeinspector.fuzz_item('The Quick Brown Fox',
+                                   'The Fantastic Mr. Fox') == 53
+
+
+def test_fuzz_set():
+    lista = ['The', 'Quick', 'Brown', 'Fox']
+    listb = ['The', 'Fantastic', 'Mr.', 'Fox']
+    assert citeinspector.fuzz_set(lista, listb) == 56
