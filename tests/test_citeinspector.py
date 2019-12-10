@@ -65,6 +65,13 @@ def test_get_page_url_nonwiki():
         citeinspector.get_page_url(input_url)
 
 
+def test_get_page_url_malformed():
+    input_url = ('https://en.wikipedia.org/'
+                 'User:AntiCompositeNumber/test_anticompositetools')
+    with pytest.raises(ValueError):
+        citeinspector.get_page_url(input_url)
+
+
 def test_get_wikitext():
     url = ('https://en.wikipedia.org/w/index.php?'
            'title=User:AntiCompositeNumber/test_anticompositetools')
@@ -175,3 +182,41 @@ def test_fuzz_set():
     lista = ['The', 'Quick', 'Brown', 'Fox']
     listb = ['The', 'Fantastic', 'Mr.', 'Fox']
     assert citeinspector.fuzz_set(lista, listb) == 56
+
+
+def test_get_parsoid_data_isbn():
+    s = requests.Session()
+    ident = '9781786751041'
+    data = citeinspector.get_parsoid_data(ident, s)
+    citedata = {'ISBN': ['978-1-78675-104-1', '1-78675-104-6'],
+                'accessDate': '2019-12-10',
+                'author': [['', 'Carroll, Lewis, 1832-1898,']],
+                'contributor': [['', 'Ingpen, Robert, 1936-']],
+                'edition': 'New edition',
+                'itemType': 'book',
+                'numPages': '1 volume',
+                'oclc': '1063566503',
+                'place': 'London',
+                'source': ['WorldCat'],
+                'title': "Alice's adventures in Wonderland",
+                'url': 'https://www.worldcat.org/oclc/1063566503'}
+    assert data
+    assert data == citedata
+
+
+def test_get_parsoid_data_invalid_ident():
+    s = requests.Session()
+    ident = 'Test'
+    data = citeinspector.get_parsoid_data(ident, s)
+    assert data is None
+
+
+def test_get_TemplateData_map():
+    session = requests.Session()
+    template = 'Cite web'
+    data = citeinspector.get_TemplateData_map(template, session)
+    assert data.get('maps').get('citoid')
+    assert type(data.get('maps').get('citoid')) is dict
+    assert data.get('paramOrder')
+    assert type(data.get('paramOrder')) is list
+    assert data.get('title') == 'Template:Cite web'
