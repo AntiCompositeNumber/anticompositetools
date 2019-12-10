@@ -20,6 +20,7 @@
 import pytest
 import requests
 import mwparserfromhell as mwph
+import unittest.mock as mock
 import sys
 import os
 sys.path.append(os.path.realpath(os.path.dirname(__file__)+"/.."))
@@ -122,6 +123,18 @@ def test_find_refs():
     assert len(refs) == 2
 
 
+def test_find_refs_blank():
+    code = mwph.parse('')
+    refs = list(citeinspector.find_refs(code, ['Cite book']))
+    assert len(refs) == 0
+
+
+def test_find_refs_notemplate():
+    code = mwph.parse('<ref>Smith, John</ref>')
+    refs = list(citeinspector.find_refs(code, ['Cite book']))
+    assert len(refs) == 0
+
+
 def test_get_bib_ident_isbn():
     data = {'data': {'edition': 'Newition',
                      'isbn': '9781786751041 ',
@@ -220,3 +233,21 @@ def test_get_TemplateData_map():
     assert data.get('paramOrder')
     assert type(data.get('paramOrder')) is list
     assert data.get('title') == 'Template:Cite web'
+
+
+def test_get_retry_servererr():
+    s = mock.MagicMock()
+    response = mock.MagicMock()
+    response.raise_for_status.side_effect = Exception('internal server error')
+    response.status_code == 500
+    response.text = ''
+    mock_sleep = mock.MagicMock()
+    s.get.return_value = response
+
+    with mock.patch('time.sleep', mock_sleep):
+        with pytest.raises(Exception):
+            citeinspector.get_retry('http://example.com', s)
+
+    assert mock_sleep.mock_calls == [
+        mock.call(5), mock.call(10), mock.call(15)]
+    assert s.get.call_count == 4
