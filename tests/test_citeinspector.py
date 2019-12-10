@@ -20,7 +20,10 @@
 import pytest
 import requests
 import mwparserfromhell as mwph
-import src.citeinspector as citeinspector
+import sys
+import os
+sys.path.append(os.path.realpath(os.path.dirname(__file__)+"/.."))
+import src.citeinspector as citeinspector  # noqa: E402
 
 
 def test_get_page_url():
