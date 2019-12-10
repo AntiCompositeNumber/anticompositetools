@@ -31,5 +31,5 @@ jobs:
         coverage run -m pytest
     - name: Coveralls
       run: |
-        pip install coveralls-python
+        pip install coveralls
         coveralls
