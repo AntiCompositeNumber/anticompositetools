@@ -30,8 +30,8 @@ jobs:
         pip install coverage
         coverage run -m pytest
     - name: Coveralls
-      env:
-        COVERALLS_REPO_TOKEN: %{{ secrets.coveralls_repo_key }}
+      env:        
+        COVERALLS_REPO_TOKEN: ${{ secrets.coveralls_repo_key }}
       run: |
         pip install coveralls
         coveralls
