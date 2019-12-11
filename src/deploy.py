@@ -67,7 +67,7 @@ def deploy(request, payload):
             flask.current_app.config['github_deploy_pat'])
     status_url = payload['deployment']['statuses_url']
     if pull_master():
-        update_status(status_url, 'in_progress', auth)
+        update_status(status_url, 'success', auth)
         restart_webservice()
         return True
     else:
