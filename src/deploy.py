@@ -59,7 +59,7 @@ def deploy(request, payload):
     logging.info('Deployment starting')
     logging.debug(payload)
     auth = ('AntiCompositeNumber',
-            flask_current_app.config['github_deploy_pat'])
+            flask.current_app.config['github_deploy_pat'])
     status_url = payload['deployment']['statuses_url']
     if pull_master():
         update_status(status_url, 'in_progress', auth)
