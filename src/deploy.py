@@ -23,8 +23,6 @@ import requests
 import hmac
 import flask
 
-logging.basicConfig(filename='deploy.log', level=logging.DEBUG)
-
 bp = flask.Blueprint('deploy', __name__, url_prefix='/deploy')
 
 
