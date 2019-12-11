@@ -50,7 +50,7 @@ def restart_webservice():
 def update_status(url, status, auth):
     payload = {'state': status}
     headers = {'Accept': 'application/vnd.github.flash-preview+json'}
-    response = requests.post(url, auth=auth, data=payload, headers=headers)
+    response = requests.post(url, auth=auth, json=payload, headers=headers)
     logging.debug(response.text)
     return response.status_code == 201
 
