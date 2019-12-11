@@ -40,9 +40,10 @@ def create_app():
                          stderr=subprocess.PIPE)
     app.config['version'] = rev.stdout
 
-    from . import hyphenator, citeinspector
+    from . import hyphenator, citeinspector, deploy
     app.register_blueprint(hyphenator.bp)
     app.register_blueprint(citeinspector.bp)
+    app.register_blueprint(deploy.bp)
 
     @app.route('/')
     def index():
