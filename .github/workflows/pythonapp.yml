@@ -35,3 +35,22 @@ jobs:
       run: |
         pip install coveralls
         coveralls
+  deploy:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: create deployment
+      uses: NiklasMerz/github-deployment-action@v1.0.0
+      if: contains(github.ref, 'master')
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        args: -o AntiCompositeNumber -r anticompositetools -c master -e production
+    - name: set deployment status
+      uses: NiklasMerz/github-deployment-action@v1.0.0
+      if: contains(github.ref, 'master')
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        args: -o AntiCompositeNumber -r anticompositetools -s pending -f

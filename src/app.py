@@ -17,11 +17,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Shim for the toolforge uwsgi configuration"""
-
 import os
 import sys
 sys.path.append(os.getcwd()[:-4])
-from src import create_app
+from src import create_app  # noqa E402
 
 app = create_app()
