@@ -58,7 +58,8 @@ def update_status(url, status, auth):
 def deploy(request, payload):
     logging.info('Deployment starting')
     logging.debug(payload)
-    auth = ('AntiCompositeNumber', bp.config['github_deploy_pat'])
+    auth = ('AntiCompositeNumber',
+            flask_current_app.config['github_deploy_pat'])
     status_url = payload['deployment']['statuses_url']
     if pull_master():
         update_status(status_url, 'in_progress', auth)
@@ -74,7 +75,7 @@ def check_status(payload):
 
 
 def verify_hmac(request):
-    config = bp.config
+    config = flask.current_app.config
     r_hmac = hmac.new((config['github_secret']).encode(),
                       msg=request.get_data(), digestmod='sha1')
     r_digest = 'sha1=' + r_hmac.hexdigest()
