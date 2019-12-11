@@ -208,7 +208,6 @@ def test_get_parsoid_data_isbn():
     ident = '9781786751041'
     data = citeinspector.get_parsoid_data(ident, s)
     citedata = {'ISBN': ['978-1-78675-104-1', '1-78675-104-6'],
-                'accessDate': '2019-12-10',
                 'author': [['', 'Carroll, Lewis, 1832-1898,']],
                 'contributor': [['', 'Ingpen, Robert, 1936-']],
                 'edition': 'New edition',
@@ -219,6 +218,7 @@ def test_get_parsoid_data_isbn():
                 'source': ['WorldCat'],
                 'title': "Alice's adventures in Wonderland",
                 'url': 'https://www.worldcat.org/oclc/1063566503'}
+    data.pop('accessDate', None)
     assert data
     assert data == citedata
 
