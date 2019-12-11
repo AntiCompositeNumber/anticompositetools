@@ -100,7 +100,7 @@ def autodeploy():
             logging.error(problem)
             return 'Exception while deploying:\n' + str(problem), 500
         if deploy_result:
-            flask.abort(204)
+            return '', 204
         else:
             flask.abort(504)
     else:
