@@ -30,3 +30,8 @@ import src.hyphenator as hyphenator  # noqa: E402
 def test_check_isbn_ten():
     isbn = '0486821951'
     assert hyphenator.check_isbn(isbn)
+
+
+def test_check_isbn_hyphenten():
+    isbn = '0-486-82195-1'
+    assert hyphenator.check_isbn(isbn)
