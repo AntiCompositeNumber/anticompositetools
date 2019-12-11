@@ -21,14 +21,14 @@
         <div class="card-body">
           <h2 class="card-title">Hyphenator</h2>
           <p class="card-text">Automatically hyphenates ISBNs and converts 10-digit ISBNs to 13-digit ISBNs.</p>
-          <p><a class="card-link" href="{{url_for('hyphenator_form')}}" role="button">Run</a></p>
+          <p><a class="card-link" href="{{url_for('hyphenator.form')}}" role="button">Run</a></p>
         </div>
       </div>
       <div class="card">
         <div class="card-body">
-          <h2 class="card-title">HijackSpam</h2>
-          <p class="card-text">This report, automatically created by AntiCompositeBot, list pages that link to what used to be an academic journal but is now malware and spam.</p>
-          <p><a class="card-link" href="https://tools-static.wmflabs.org/anticompositebot/HijackSpam.html" role="button">View report &raquo;</a></p>
+          <h2 class="card-title">CiteInspector <span class="badge badge-info">Beta</span></h2>
+          <p class="card-text">Compares existing citations to Citoid data.</p>
+          <p><a class="card-link" href="{{url_for('citeinspector.form')}}" role="button">Run</a></p>
         </div>
       </div>
     </div>

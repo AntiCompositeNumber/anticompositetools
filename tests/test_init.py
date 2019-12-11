@@ -17,9 +17,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
+import flask
+import json
 import sys
-sys.path.append(os.getcwd()[:-4])
-from src import create_app  # noqa E402
+import os
+sys.path.append(os.path.realpath(os.path.dirname(__file__)+"/.."))
+import src as anticompositetools  # noqa: E402
 
-app = create_app()
+
+def test_create_app():
+    __dir__ = os.path.realpath(os.path.dirname(__file__)+"/..")
+    conf = os.path.join(__dir__, 'src/config.json')
+    try:
+        open(conf, 'r')
+    except FileNotFoundError:
+        with open(conf, 'w') as f:
+            json.dump({'secret_key': 'Test'}, f)
+
+    app = anticompositetools.create_app()
+    assert type(app) is flask.app.Flask

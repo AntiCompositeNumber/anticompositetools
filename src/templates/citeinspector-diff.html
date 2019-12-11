@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+{% block title %}CiteInspector - Result{% endblock %}
+{% block head %}
+  {{ super() }}
+  <style type="text/css">
+    .important { color: #336699; }
+  </style>
+{% endblock %}
+{% block content %}
+<h1>Result</h1>
+<div>
+  <form action="{{url_for('citeinspector.concat')}}" method="post">
+  {% for name, cite in d.items()|sort(attribute='1.ratio') %}
+  <div class="container border rounded shadow-sm p-3 mb-3" id={{name}}>
+      <h5>{{cite['data']['title']['wikitext']}} <span class="badge badge-primary text-align-right">{{cite['ratio']}} %</span></h5>
+    <table class="table table-hover align-content-center">
+      <thead>
+        <tr>
+          <th scope="col">Para</th>
+          <th scope="col">Wikitext</th>
+          <th scope="col">{{cite['citoid_source']}}</th>
+          <th scope="col">Match</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for para, paradata in cite['data'].items()|sort(attribute='1.ratio') %}
+        <tr class="">
+          <th scope="row">{{para}}</th>
+          <td class="text-right m-0"><span class="form-check form-check-inline">
+            <label class="form-check-label" for="{{name}}/{{para}}/wt">{{paradata['wikitext']}}</label>
+            <input class="form-check-input ml-2" type="radio" name="{{name}}/{{para}}" id="{{cite['name']}}/{{para}}/wt" value="{{paradata['wikitext']}}" checked>
+          </span></td>
+          <td class="m-0"><span class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="{{name}}/{{para}}" id="{{cite['name']}}/{{para}}/ct" value="{{paradata['citoid']}}">
+            <label class="form-check-label" for="{{name}}/{{para}}/ct">{{paradata['citoid']}}</label>
+          </span></td>
+          <td class="text-right col-sm-auto">
+            <h5 class="mb-0"><span class="badge badge-primary">{{paradata['ratio']}}%</span></h5>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endfor %}
+  <textarea class="d-none" name='wikitext'>{{wikitext}}</textarea>
+  <textarea class="d-none" name='data'>{{d|tojson}}</textarea>
+  <textarea class="d-none" name='meta'>{{meta|tojson}}</textarea>
+  <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+</div>
+{% endblock %}
