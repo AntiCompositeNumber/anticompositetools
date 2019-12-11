@@ -30,15 +30,20 @@ def pull_master():
     logging.info('Pulling from git repository')
     try:
         pull = subprocess.run(
-            ['git', '-C', '~/anticompositetools/', 'pull'], check=True,
+            ['git', '-C',
+             '/data/project/anticompositetools/anticompositetools/',
+             'pull'],
+            check=True,
             universal_newlines=True, stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
+    except subprocess.CalledProcessError as cpe:
         logging.debug(pull.stdout)
         logging.error(pull.stderr)
-    except subprocess.CalledProcessError as cpe:
         logging.error(cpe)
         return False
     else:
+        logging.debug(pull.stdout)
+        logging.error(pull.stderr)
         return True
 
 
