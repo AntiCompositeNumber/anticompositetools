@@ -44,8 +44,11 @@ def get_wikitext(url):
             if request.status_code == 404:
                 flash.append(('That page does not exist.', 'danger'))
                 raise
+            elif i == 4:
+                flash.append(('Unable to retrieve wikitext.', 'danger'))
+                raise
             else:
-                time.sleep(5)
+                time.sleep(5*i)
                 continue
         else:
             start_time = time.strftime('%Y%m%d%H%M%S', time.gmtime())
