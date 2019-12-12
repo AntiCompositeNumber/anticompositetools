@@ -32,6 +32,26 @@ def test_check_isbn_ten():
     assert hyphenator.check_isbn(isbn)
 
 
-def test_check_isbn_hyphenten():
+def test_check_isbn_hyphen10():
     isbn = '0-486-82195-1'
     assert hyphenator.check_isbn(isbn)
+
+
+def test_check_isbn_13():
+    isbn = '9780393020397'
+    assert hyphenator.check_isbn(isbn)
+
+
+def test_check_isbn_hyphen13():
+    isbn = '978-0-393-02039-7'
+    assert not hyphenator.check_isbn(isbn)
+
+
+def test_check_isbn_invalid():
+    isbn = '9780393020390'
+    assert not hyphenator.check_isbn(isbn)
+
+
+def test_check_isbn_notIsbn():
+    isbn = '0118999'
+    assert not hyphenator.check_isbn(isbn)
