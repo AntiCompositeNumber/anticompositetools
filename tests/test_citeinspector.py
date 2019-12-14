@@ -25,6 +25,14 @@ import sys
 import os
 sys.path.append(os.path.realpath(os.path.dirname(__file__)+"/.."))
 import src.citeinspector as citeinspector  # noqa: E402
+import src  # noqa: E402
+
+
+@pytest.fixture
+def client():
+    app = src.create_app()
+    with app.test_client() as test_client:
+        yield test_client
 
 
 def test_get_page_url_page():
@@ -192,6 +200,24 @@ def test_lastnamefirstname_one():
     assert last == 'Jimbo'
 
 
+def test_find_article_date_format_mdy():
+    text = '{{use mdy dates}}\n{{refimprove}}\nLorem, Ipsum. Dolor sit amet.'
+    code = mwph.parse(text)
+    assert citeinspector.find_article_date_format(code) == 'mdy'
+
+
+def test_find_article_date_format_dmy():
+    text = '{{use dmy dates}}\n{{refimprove}}\nLorem, Ipsum. Dolor sit amet.'
+    code = mwph.parse(text)
+    assert citeinspector.find_article_date_format(code) == 'dmy'
+
+
+def test_find_article_date_format_default():
+    text = '{{use British English}}\n{{refimprove}}\nLorem, Ipsum. Dolor sit.'
+    code = mwph.parse(text)
+    assert citeinspector.find_article_date_format(code) == 'default'
+
+
 def test_fuzz_item():
     assert citeinspector.fuzz_item('The Quick Brown Fox',
                                    'The Fantastic Mr. Fox') == 53
@@ -257,3 +283,15 @@ def test_get_retry_servererr():
     assert mock_sleep.mock_calls == [
         mock.call(5), mock.call(10), mock.call(15)]
     assert s.get.call_count == 4
+
+
+def test_get_retry_badmethod():
+    with pytest.raises(NotImplementedError):
+        citeinspector.get_retry('http://example.com', requests.Session(),
+                                method='delete')
+
+
+def test_form(client):
+    response = client.get('/citeinspector/')
+    assert response.status_code == 200
+    assert response.data

@@ -3,3 +3,4 @@ venv/
 config.json
 *.log
 .coverage
+htmlcov/
