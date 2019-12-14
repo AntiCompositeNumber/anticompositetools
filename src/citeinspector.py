@@ -56,23 +56,26 @@ def get_retry(url, session, method='get', output='object', data=None):
                'tools.anticompositetools@tools.wmflabs.org) python-requests/'
                + requests.__version__}
 
-    for i in range(1, 5):
+    for i in range(1, 5):  # pragma: no branch
         try:
             if method == 'get':
                 response = session.get(url, headers=headers)
             elif method == 'post':
                 response = session.post(url, headers=headers, data=data)
+            else:
+                raise NotImplementedError
 
             response.raise_for_status()
 
             if output == 'json':
                 output_json = response.json()
 
+        except NotImplementedError:
+            raise
         except Exception as err:
+            # TODO: Figure out which exceptions should be caught here.
             print(err)
-            if (
-                    response.status_code == 404 or
-                    response.status_code == 400 or
+            if (response.status_code in [404, 400] or
                     response.text == 'upstream request timeout'):
 
                 if output == 'object':
@@ -89,7 +92,7 @@ def get_retry(url, session, method='get', output='object', data=None):
 
     if output == 'json':
         return output_json
-    elif output == 'object':
+    else:
         return response
 
 
