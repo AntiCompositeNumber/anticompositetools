@@ -33,8 +33,7 @@ def get_AFC_reviewers(site):
             for template in code.ifilter_templates(matches='user2')}
 
 
-def gen_recent_moves(site, total):
-    i = 0
+def gen_recent_moves(site):
     for event in site.logevents(logtype='move'):
         if (
                 event.target_ns == 0
@@ -42,9 +41,6 @@ def gen_recent_moves(site, total):
                 and 'Draft:Move' not in event.page().title()
                 ):
             yield event
-            i += 1
-            if i == total:
-                break
 
 
 def check_deletions(page, site):
@@ -88,7 +84,7 @@ def log_metadata(site, event):
         'old_title': old_page.title(),
         'url': page.full_url(),
         'old_url': old_page.full_url(),
-        'timestamp': event.timestamp(),
+        'timestamp': str(event.timestamp()),
         'user': username,
         'user_url': user.getUserPage().full_url(),
         'user_talk_url': user.getUserTalkPage().full_url(),
@@ -102,7 +98,10 @@ def iter_suspicious_moves(limit):
     site = pywikibot.Site('en', 'wikipedia')
     reviewers = get_AFC_reviewers(site)
 
-    for move in gen_recent_moves(site, limit):
+    i = 0
+    for move in gen_recent_moves(site):
+        if i == limit:
+            break
         old_page = move.page()
         new_page = move.target_page
         tags = ['non-AfC-move']
@@ -117,6 +116,7 @@ def iter_suspicious_moves(limit):
 
         data = log_metadata(site, move)
         data['tags'] = tags
+        i += 1
         yield data
 
 

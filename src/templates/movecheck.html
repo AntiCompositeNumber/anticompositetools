@@ -28,7 +28,7 @@
   <div>
     <ul>
     {% for d in data %}
-      <li class="mb-2">{{d['timestamp']}} <a href="{{d['user_url']}}">{{d['user']}}</a> (<a href="{{d['user_talk_url']}}">talk</a> | <a href="{{d['user_contribs_url']}}">contribs</a>) moved page <a href="{{d['old_url']}}">{{d['old_title']}}</a> to <a href="{{d['url']}}">{{d['title']}}</a> {% if d['comment'] %}({{d['comment']}}){% endif %} {{d['tags']}}</li>
+      <li class="mb-2 logitem">{{d['timestamp']}} <a href="{{d['user_url']}}">{{d['user']}}</a> (<a href="{{d['user_talk_url']}}">talk</a> | <a href="{{d['user_contribs_url']}}">contribs</a>) moved page <a href="{{d['old_url']}}">{{d['old_title']}}</a> to <a href="{{d['url']}}">{{d['title']}}</a> {% if d['comment'] %}({{d['comment']}}){% endif %} {{d['tags']}}</li>
     {% endfor %}
     </ul>
 {% endblock %}
