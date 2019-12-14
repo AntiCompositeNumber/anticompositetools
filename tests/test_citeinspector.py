@@ -200,24 +200,6 @@ def test_lastnamefirstname_one():
     assert last == 'Jimbo'
 
 
-def test_find_article_date_format_mdy():
-    text = '{{use mdy dates}}\n{{refimprove}}\nLorem, Ipsum. Dolor sit amet.'
-    code = mwph.parse(text)
-    assert citeinspector.find_article_date_format(code) == 'mdy'
-
-
-def test_find_article_date_format_dmy():
-    text = '{{use dmy dates}}\n{{refimprove}}\nLorem, Ipsum. Dolor sit amet.'
-    code = mwph.parse(text)
-    assert citeinspector.find_article_date_format(code) == 'dmy'
-
-
-def test_find_article_date_format_default():
-    text = '{{use British English}}\n{{refimprove}}\nLorem, Ipsum. Dolor sit.'
-    code = mwph.parse(text)
-    assert citeinspector.find_article_date_format(code) == 'default'
-
-
 def test_fuzz_item():
     assert citeinspector.fuzz_item('The Quick Brown Fox',
                                    'The Fantastic Mr. Fox') == 53
