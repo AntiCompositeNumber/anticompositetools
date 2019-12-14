@@ -17,27 +17,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import flask
-import json
+# import pytest
+# import requests
+# import mwparserfromhell as mwph
+import unittest.mock as mock
 import sys
 import os
 sys.path.append(os.path.realpath(os.path.dirname(__file__)+"/.."))
-import src as anticompositetools  # noqa: E402
+import src.deploy as deploy  # noqa: E402
 
 
-def test_create_app():
-    __dir__ = os.path.realpath(os.path.dirname(__file__)+"/..")
-    conf = os.path.join(__dir__, 'src/config.json')
-    try:
-        open(conf, 'r')
-    except FileNotFoundError:
-        with open(conf, 'w') as f:
-            json.dump({'secret_key': 'Test'}, f)
+def test_check_status():
+    payload = {'deployment_status': {'state': 'pending'}}
+    assert deploy.check_status(payload)
 
-    app = anticompositetools.create_app()
-    assert type(app) is flask.app.Flask
 
-    with app.test_client() as client:
-        r = client.get('/')
-        assert r.status_code == 200
-        assert r.data is not None
+def test_restart_webservice():
+    m = mock.MagicMock()
+    with mock.patch('subprocess.Popen', m):
+        d = deploy.restart_webservice()
+    assert d is None
+    m.assert_called_once_with(['webservice', 'restart'])
