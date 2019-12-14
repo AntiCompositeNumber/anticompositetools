@@ -18,23 +18,19 @@
 # limitations under the License.
 
 import flask
-import json
+import unittest.mock as mock
 import sys
 import os
 sys.path.append(os.path.realpath(os.path.dirname(__file__)+"/.."))
-import src.app  # noqa: E402
 
 
 def test_app():
-    __dir__ = os.path.realpath(os.path.dirname(__file__)+"/..")
-    conf = os.path.join(__dir__, 'src/config.json')
-    try:
-        open(conf, 'r')
-    except FileNotFoundError:
-        with open(conf, 'w') as f:
-            json.dump({'secret_key': 'Test'}, f)
-
-    app = src.app.app
+    m = mock.Mock()
+    n = mock.Mock()
+    m.return_value = {'secret_key': 'Test'}
+    with mock.patch('json.load', m):
+        with mock.patch('builtins.open', n):
+            from src.app import app
     assert type(app) is flask.app.Flask
 
     with app.test_client() as client:

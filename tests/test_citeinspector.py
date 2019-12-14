@@ -30,7 +30,13 @@ import src  # noqa: E402
 
 @pytest.fixture
 def client():
-    app = src.create_app()
+    m = mock.Mock()
+    n = mock.Mock()
+    m.return_value = {'secret_key': 'Test'}
+    with mock.patch('json.load', m):
+        with mock.patch('builtins.open', n):
+            app = src.create_app()
+
     with app.test_client() as test_client:
         yield test_client
 
