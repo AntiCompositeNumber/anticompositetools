@@ -34,7 +34,7 @@ def get_AFC_reviewers(site):
 
 
 def gen_recent_moves(site):
-    for event in site.logevents(logtype='move'):
+    for event in site.logevents(logtype='move'):  # pragma: no branch
         if (
                 event.target_ns == 0
                 and event.ns() != 0
@@ -99,7 +99,7 @@ def iter_suspicious_moves(limit):
     reviewers = get_AFC_reviewers(site)
 
     i = 0
-    for move in gen_recent_moves(site):
+    for move in gen_recent_moves(site):  # pragma: no branch
         if i == limit:
             break
         old_page = move.page()
@@ -123,12 +123,20 @@ def iter_suspicious_moves(limit):
 @bp.route('')
 def movecheck():
     raw_limit = flask.request.args.get('limit', default='20')
-    if int(raw_limit) < 1:
-        limit = 20
-    elif int(raw_limit) > 250 or raw_limit == 'max':
-        limit = 250
+    try:
+        int_limit = int(raw_limit)
+    except ValueError:
+        if raw_limit == 'max':
+            limit = 250
+        else:
+            limit = 20
     else:
-        limit = int(raw_limit)
+        if int_limit < 1:
+            limit = 20
+        elif int_limit > 250:
+            limit = 250
+        else:
+            limit = int_limit
 
     moves = iter_suspicious_moves(limit)
     return flask.render_template('movecheck.html', data=moves)

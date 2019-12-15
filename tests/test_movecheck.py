@@ -125,7 +125,7 @@ def test_log_metadata(site):
 
 
 def test_iter_suspicious_moves():
-    limit = 5
+    limit = 3
     data = movecheck.iter_suspicious_moves(limit)
     assert inspect.isgenerator(data)
     ldata = list(data)
@@ -140,7 +140,62 @@ def test_iter_suspicious_moves():
             assert tag
 
 
+def test_iter_suspicious_moves_tags():
+    m = mock.Mock()
+    m.return_value = True
+    with mock.patch('src.movecheck.check_deletions', m):
+        with mock.patch('src.movecheck.check_declines', m):
+            data = next(movecheck.iter_suspicious_moves(1))
+
+    for key in ['non-AfC-move', 'previous-ns0-del', 'previous-draft-del',
+                'previous-afc-decline']:
+        assert key in data['tags']
+
+
+def test_iter_suspicious_moves_reviewers():
+    m = mock.MagicMock()
+    move = mock.MagicMock()
+    move.user.return_value = 'AntiCompositeNumber'
+    m.return_value = [move]
+    with mock.patch('src.movecheck.gen_recent_moves', m):
+        with pytest.raises(StopIteration):
+            next(movecheck.iter_suspicious_moves(1))
+
+
 def test_movecheck(client):
-    limit = 5
+    limit = 3
     response = client.get('/movecheck?limit=' + str(limit))
     assert response.data.count(b'logitem') == limit
+
+
+def test_movecheck_default(client):
+    response = client.get('/movecheck')
+    assert response.data.count(b'logitem') == 20
+
+
+def test_movecheck_limits_zero(client):
+    n = mock.MagicMock()
+    with mock.patch('src.movecheck.iter_suspicious_moves', n):
+        client.get('/movecheck?limit=0')
+    n.assert_called_with(20)
+
+
+def test_movecheck_limits_max(client):
+    n = mock.MagicMock()
+    with mock.patch('src.movecheck.iter_suspicious_moves', n):
+        client.get('/movecheck?limit=max')
+    n.assert_called_with(250)
+
+
+def test_movecheck_limits_over(client):
+    n = mock.MagicMock()
+    with mock.patch('src.movecheck.iter_suspicious_moves', n):
+        client.get('/movecheck?limit=500')
+    n.assert_called_with(250)
+
+
+def test_movecheck_limits_nonsense(client):
+    n = mock.MagicMock()
+    with mock.patch('src.movecheck.iter_suspicious_moves', n):
+        client.get('/movecheck?limit=nonsense')
+    n.assert_called_with(20)
