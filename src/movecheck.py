@@ -82,10 +82,7 @@ def batch_pages(keys):
 
 def batch_ores(data):
     for batch in batch_pages(list(data)):
-        revids = ''
-        for revid in revids:
-            revids.append(revid + '|')
-        revids = revids[:-1]
+        revids = '|'.append(batch)
         query_ores(revids)
 
 
