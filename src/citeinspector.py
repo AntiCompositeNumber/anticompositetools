@@ -273,6 +273,7 @@ def get_TemplateData_map(template, session):
 
 
 def concat_items(wikitext_data, citoid_data):
+    """Zip wikitext and citoid data together"""
     cite = {}
     wt_citedata = wikitext_data['data']
     ct_citedata = citoid_data['data']
@@ -284,12 +285,23 @@ def concat_items(wikitext_data, citoid_data):
     cite['ratio'] = fuzz_seq(wt_citedata.values(), ct_citedata.values())
     cite['data'] = {}
 
-    keys = list(ct_citedata)
-    for key in wt_citedata:
+    templatedata = citoid_data['template_data']
+    keys = list(wt_citedata)
+    for key in ct_citedata:
         if key not in keys:
-            keys.append(key)
+            # Switch key from citoid to param alias used in wikitext
+            aliases = templatedata['params'].get(key, {}).get('aliases', [])
+            for alias in aliases:
+                if alias in keys:
+                    ct_citedata[alias] = ct_citedata.pop(key)
+                    break
+            else:
+                keys.append(key)
 
     for key in keys:
+        if key == 'access-date':
+            # Ignore access date, shouldn't be changed for metadata changes
+            continue
         wt_value = wt_citedata.get(key, '')
         ct_value = ct_citedata.get(key, '')
         cite['data'][key] = {
