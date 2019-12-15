@@ -90,6 +90,7 @@ def batch_ores(data):
 
 
 def query_ores(revids):
+    raise NotImplementedError
     payload = {'models': 'draftquality',
                'revids': revids}
     url = 'https://ores.wikimedia.org/v3/scores/enwiki/'
