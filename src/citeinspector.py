@@ -163,7 +163,7 @@ def grab_cite_data(template, supported_templates):
 
     if template_name in supported_templates:
         data = {str(para.name).lower().strip(): str(para.value)
-                for para in template.params}
+                for para in template.params if para.value.strip()}
         return data, template_name
     else:
         return None, None
@@ -235,9 +235,17 @@ def map_parsoid_to_templates(raw_parsoid_data, wikitext_data,
             param = td_map.get(key)
             if param is not None:
                 data[param] = value
-    return dict(name=wikitext_data['name'], template=parsoid_template,
-                source=raw_parsoid_data.get('source', '[Citoid]')[0],
-                location=wikitext_data['location'], data=data)
+    return (
+        dict(
+            name=wikitext_data['name'],
+            template=parsoid_template,
+            template_data=templatedata,
+            source=raw_parsoid_data.get('source', '[Citoid]')[0],
+            location=wikitext_data['location'],
+            data=data
+            ),
+        templatedata_cache
+        )
 
 
 def lastnamefirstname(author):
@@ -265,6 +273,7 @@ def get_TemplateData_map(template, session):
 
 
 def concat_items(wikitext_data, citoid_data):
+    """Zip wikitext and citoid data together"""
     cite = {}
     wt_citedata = wikitext_data['data']
     ct_citedata = citoid_data['data']
@@ -273,15 +282,26 @@ def concat_items(wikitext_data, citoid_data):
         cite['template'] = [wikitext_data['template'], citoid_data['template']]
     cite['citoid_source'] = citoid_data['source']
     cite['location'] = wikitext_data['location']
-    cite['ratio'] = fuzz_set(wt_citedata.values(), ct_citedata.values())
+    cite['ratio'] = fuzz_seq(wt_citedata.values(), ct_citedata.values())
     cite['data'] = {}
 
-    keys = list(ct_citedata)
-    for key in wt_citedata:
+    templatedata = citoid_data['template_data']
+    keys = list(wt_citedata)
+    for key in ct_citedata:
         if key not in keys:
-            keys.append(key)
+            # Switch key from citoid to param alias used in wikitext
+            aliases = templatedata['params'].get(key, {}).get('aliases', [])
+            for alias in aliases:
+                if alias in keys:
+                    ct_citedata[alias] = ct_citedata.pop(key)
+                    break
+            else:
+                keys.append(key)
 
     for key in keys:
+        if key == 'access-date':
+            # Ignore access date, shouldn't be changed for metadata changes
+            continue
         wt_value = wt_citedata.get(key, '')
         ct_value = ct_citedata.get(key, '')
         cite['data'][key] = {
@@ -299,7 +319,7 @@ def fuzz_item(item_a, item_b):
     return fuzz.partial_ratio(item_a, item_b)
 
 
-def fuzz_set(set_a, set_b):
+def fuzz_seq(set_a, set_b):
     str_a = ''
     str_b = ''
     for item in set_a:
@@ -360,9 +380,13 @@ def citeinspector(url):
             continue
 
         if raw_parsoid_data is not None:
-            parsoid_data = map_parsoid_to_templates(
-                raw_parsoid_data, old_data, templatedata_cache,
-                template_type_map, session)
+            parsoid_data, templatedata_cache = map_parsoid_to_templates(
+                raw_parsoid_data,
+                old_data,
+                templatedata_cache,
+                template_type_map,
+                session
+                )
         else:
             continue
         citedata = concat_items(old_data, parsoid_data)
