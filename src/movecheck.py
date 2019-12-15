@@ -20,6 +20,7 @@
 import pywikibot
 import mwparserfromhell as mwph
 import flask
+import requests
 
 bp = flask.Blueprint('movecheck', __name__, url_prefix='/movecheck')
 
@@ -74,6 +75,33 @@ def check_declines(page):
         return False
 
 
+def batch_pages(keys):
+    for i in range(0, len(keys), 45):
+        yield keys[i:i+45]
+
+
+def batch_ores(data):
+    for batch in batch_pages(list(data)):
+        revids = ''
+        for revid in revids:
+            revids.append(revid + '|')
+        revids = revids[:-1]
+        query_ores(revids)
+
+
+def query_ores(revids):
+    payload = {'models': 'draftquality',
+               'revids': revids}
+    url = 'https://ores.wikimedia.org/v3/scores/enwiki/'
+
+    response = requests.get(url, params=payload)
+    response.raise_for_status()
+    json = response.json()
+
+    data = json['scores']
+    data
+
+
 def log_metadata(site, event):
     page = event.target_page
     old_page = event.page()
@@ -99,6 +127,7 @@ def iter_suspicious_moves(limit):
     reviewers = get_AFC_reviewers(site)
 
     i = 0
+    out = {}
     for move in gen_recent_moves(site):  # pragma: no branch
         if i == limit:
             break
@@ -117,7 +146,9 @@ def iter_suspicious_moves(limit):
         data = log_metadata(site, move)
         data['tags'] = tags
         i += 1
-        yield data
+        out[new_page.latest_revision_id] = data
+
+    return out
 
 
 @bp.route('')
