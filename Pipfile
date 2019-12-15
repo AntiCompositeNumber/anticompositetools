@@ -24,6 +24,7 @@ MarkupSafe = "*"
 PyMySQL = "*"
 Werkzeug = "*"
 python-Levenshtein = "*"
+requests-oauthlib = "*"
 
 [requires]
 python_version = "3.7"

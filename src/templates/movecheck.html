@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+{% block title %}Movecheck{% endblock %}
+{% block head %}
+  {{ super() }}
+  <style type="text/css">
+    .important { color: #336699; }
+  </style>
+{% endblock %}
+{% block content %}
+  <h1>Movecheck <span class="badge badge-info">Beta</span></h1>
+  <div class="border shadow-sm container py-3 mb-3">
+    <p>This tool lists recent moves to mainspace by users other than AfC reviewers.</p>
+    <form action="{{url_for('movecheck.movecheck')}}" method="get">
+      <div class="form-group row">
+        <label for="inputLimit" class="col-sm col-form-label">Changes to display:</label>
+        <div class="col-sm float-right">
+          <select class="form-control" id="inputLimit" name="limit">
+            <option selected>20</option>
+            <option>50</option>
+            <option>100</option>
+            <option>250</option>
+          </select>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+  </div>
+  <div>
+    <ul>
+    {% for d in data %}
+      <li class="mb-2 logitem">{{d['timestamp']}} <a href="{{d['user_url']}}">{{d['user']}}</a> (<a href="{{d['user_talk_url']}}">talk</a> | <a href="{{d['user_contribs_url']}}">contribs</a>) moved page <a href="{{d['old_url']}}">{{d['old_title']}}</a> to <a href="{{d['url']}}">{{d['title']}}</a> {% if d['comment'] %}({{d['comment']}}){% endif %} {{d['tags']}}</li>
+    {% endfor %}
+    </ul>
+{% endblock %}
