@@ -36,6 +36,7 @@ jobs:
     - name: Coveralls
       env:        
         COVERALLS_REPO_TOKEN: ${{ secrets.coveralls_repo_key }}
+      continue-on-error: true
       run: |
         pip install coveralls
         coveralls
