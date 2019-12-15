@@ -211,10 +211,10 @@ def test_fuzz_item():
                                    'The Fantastic Mr. Fox') == 53
 
 
-def test_fuzz_set():
+def test_fuzz_seq():
     lista = ['The', 'Quick', 'Brown', 'Fox']
     listb = ['The', 'Fantastic', 'Mr.', 'Fox']
-    assert citeinspector.fuzz_set(lista, listb) == 56
+    assert citeinspector.fuzz_seq(lista, listb) == 56
 
 
 def test_get_parsoid_data_isbn():

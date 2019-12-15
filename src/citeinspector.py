@@ -163,7 +163,7 @@ def grab_cite_data(template, supported_templates):
 
     if template_name in supported_templates:
         data = {str(para.name).lower().strip(): str(para.value)
-                for para in template.params}
+                for para in template.params if para.value.strip()}
         return data, template_name
     else:
         return None, None
@@ -281,7 +281,7 @@ def concat_items(wikitext_data, citoid_data):
         cite['template'] = [wikitext_data['template'], citoid_data['template']]
     cite['citoid_source'] = citoid_data['source']
     cite['location'] = wikitext_data['location']
-    cite['ratio'] = fuzz_set(wt_citedata.values(), ct_citedata.values())
+    cite['ratio'] = fuzz_seq(wt_citedata.values(), ct_citedata.values())
     cite['data'] = {}
 
     keys = list(ct_citedata)
@@ -307,7 +307,7 @@ def fuzz_item(item_a, item_b):
     return fuzz.partial_ratio(item_a, item_b)
 
 
-def fuzz_set(set_a, set_b):
+def fuzz_seq(set_a, set_b):
     str_a = ''
     str_b = ''
     for item in set_a:
