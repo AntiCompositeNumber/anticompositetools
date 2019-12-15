@@ -4,6 +4,10 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+flake8 = "*"
+pytest = "*"
+coveralls = "*"
+pipenv-to-requirements = "*"
 
 [packages]
 certifi = "*"
@@ -15,7 +19,7 @@ mwparserfromhell = "*"
 python-stdnum = "*"
 requests = "*"
 urllib3 = "*"
-pywikibot = "*"
+pywikibot = {git = "https://phabricator.wikimedia.org/diffusion/PWBC/pywikibot.git"}
 fuzzywuzzy = "*"
 pytest = "*"
 Flask = "*"
