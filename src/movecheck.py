@@ -128,7 +128,6 @@ def iter_suspicious_moves(limit):
     reviewers = get_AFC_reviewers(site)
 
     i = 0
-    out = {}
     for move in gen_recent_moves(site):  # pragma: no branch
         if i == limit:
             break
@@ -147,9 +146,7 @@ def iter_suspicious_moves(limit):
         data = log_metadata(site, move)
         data['tags'] = tags
         i += 1
-        out[new_page.latest_revision_id] = data
-
-    return out
+        yield data
 
 
 @bp.route('')
