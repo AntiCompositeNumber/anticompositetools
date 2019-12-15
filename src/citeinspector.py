@@ -235,9 +235,17 @@ def map_parsoid_to_templates(raw_parsoid_data, wikitext_data,
             param = td_map.get(key)
             if param is not None:
                 data[param] = value
-    return dict(name=wikitext_data['name'], template=parsoid_template,
-                source=raw_parsoid_data.get('source', '[Citoid]')[0],
-                location=wikitext_data['location'], data=data)
+    return (
+        dict(
+            name=wikitext_data['name'],
+            template=parsoid_template,
+            template_data=templatedata,
+            source=raw_parsoid_data.get('source', '[Citoid]')[0],
+            location=wikitext_data['location'],
+            data=data
+            ),
+        templatedata_cache
+        )
 
 
 def lastnamefirstname(author):
@@ -360,9 +368,13 @@ def citeinspector(url):
             continue
 
         if raw_parsoid_data is not None:
-            parsoid_data = map_parsoid_to_templates(
-                raw_parsoid_data, old_data, templatedata_cache,
-                template_type_map, session)
+            parsoid_data, templatedata_cache = map_parsoid_to_templates(
+                raw_parsoid_data,
+                old_data,
+                templatedata_cache,
+                template_type_map,
+                session
+                )
         else:
             continue
         citedata = concat_items(old_data, parsoid_data)
