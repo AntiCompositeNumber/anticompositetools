@@ -97,7 +97,7 @@ def get_retry(url, session, method='get', output='object', data=None):
 
 
 def get_wikitext(url, session):
-    wikitext_url = url + '&action=raw'
+    wikitext_url = f'{url}&action=raw'
 
     request = get_retry(wikitext_url, session)
     if request.status_code == 404:
@@ -114,8 +114,10 @@ def get_wikitext(url, session):
 
 def get_citoid_template_types(session):
     """Loads template to citoid type mapping from wiki"""
-    url = get_page_url(
-        'MediaWiki:Citoid-template-type-map.json') + '&action=raw'
+    url = (
+        f'{get_page_url("MediaWiki:Citoid-template-type-map.json")[0]}'
+        '&action=raw'
+        )
     template_type_map = get_retry(url=url, session=session, output='json')
     supported_templates = [template for key, template
                            in template_type_map.items()
@@ -182,10 +184,8 @@ def get_bib_ident(cite_data):
 
 def get_parsoid_data(ident, session):
     rest_api = 'https://en.wikipedia.org/api/rest_v1/'
-    parsoid_endpoint = 'data/citation/{format}/{query}'.format(
-            format='mediawiki', query=urllib.parse.quote_plus(ident))
 
-    url = rest_api + parsoid_endpoint
+    url = f'{rest_api}data/citation/mediawiki/{urllib.parse.quote_plus(ident)}'
     data = get_retry(url, session, output='json')
     if data is not None:
         return data[0]
@@ -217,8 +217,8 @@ def map_parsoid_to_templates(raw_parsoid_data, wikitext_data,
                     ordinal = str(i + 1)
                 last, first = lastnamefirstname(author)
                 if last:
-                    data['last' + ordinal] = last
-                    data['first' + ordinal] = first
+                    data[f'last{ordinal}'] = last
+                    data[f'first{ordinal}'] = first
 
         elif key == "editor":
             for i, author in enumerate(value):
@@ -228,8 +228,8 @@ def map_parsoid_to_templates(raw_parsoid_data, wikitext_data,
                 else:
                     ordinal = str(i + 1)
                 if last:
-                    data['editor' + ordinal + '-last'] = last
-                    data['editor' + ordinal + '-first'] = first
+                    data[f'editor{ordinal}-last'] = last
+                    data[f'editor{ordinal}-first'] = first
 
         elif type(value) is str:
             param = td_map.get(key)
@@ -358,7 +358,7 @@ def get_page_url(rawinput):
         flash('Invalid URL', 'danger')
         raise ValueError  # this one too
 
-    return 'https://' + site + '/w/index.php?title=' + title
+    return f'https://{site}/w/index.php?title={title}', title
 
 
 def citeinspector(url):
@@ -448,7 +448,7 @@ def concat():
                 cite_template.add(para, value)
                 print(cite_template)
 
-    submit_url = meta['url'] + '&action=submit'
+    submit_url = f'{meta["url"]}&action=submit'
     return flask.render_template('citeinspector-redirect.html',
                                  submit_url=submit_url, newtext=str(code),
                                  start_time=meta['start_time'],
