@@ -303,10 +303,10 @@ def test_fuzz_seq():
     assert citeinspector.fuzz_seq(lista, listb) == 56
 
 
-def test_get_parsoid_data_isbn():
+def test_get_citoid_data_isbn():
     s = requests.Session()
     ident = '9781786751041'
-    data = citeinspector.get_parsoid_data(ident, s)
+    data = citeinspector.get_citoid_data(ident, s)
     citedata = {'ISBN': ['978-1-78675-104-1', '1-78675-104-6'],
                 'author': [['', 'Carroll, Lewis, 1832-1898,']],
                 'contributor': [['', 'Ingpen, Robert, 1936-']],
@@ -323,15 +323,15 @@ def test_get_parsoid_data_isbn():
     assert data == citedata
 
 
-def test_get_parsoid_data_invalid_ident():
+def test_get_citoid_data_invalid_ident():
     s = requests.Session()
     ident = 'DefinitelyLegitimateReference'
-    data = citeinspector.get_parsoid_data(ident, s)
+    data = citeinspector.get_citoid_data(ident, s)
     assert data is None
 
 
-def test_map_parsoid_to_templates():
-    raw_parsoid_data = {
+def test_map_citoid_to_templates():
+    raw_citoid_data = {
         'ISBN': ['978-1-78675-104-1', '1-78675-104-6'],
         'author': [
             ['', 'Carroll, Lewis, 1832-1898,'],
@@ -351,8 +351,8 @@ def test_map_parsoid_to_templates():
     template_type_map = {'book': 'Cite book'}
     session = requests.Session()
 
-    citoid_data, new_td_cache = citeinspector.map_parsoid_to_templates(
-            raw_parsoid_data, wikitext_data, template_data_cache,
+    citoid_data, new_td_cache = citeinspector.map_citoid_to_templates(
+            raw_citoid_data, wikitext_data, template_data_cache,
             template_type_map, session)
 
     assert type(citoid_data) is dict
@@ -371,15 +371,15 @@ def test_map_parsoid_to_templates():
     assert citedata['title'] == "Alice's adventures in Wonderland"
 
 
-def test_map_parsoid_to_templates_notemplate():
-    raw_parsoid_data = {'itemType': 'magazine'}
+def test_map_citoid_to_templates_notemplate():
+    raw_citoid_data = {'itemType': 'magazine'}
     wikitext_data = {}
     templatedata_cache = {}
     template_type_map = {'book': 'Cite book'}
     session = requests.Session()
 
-    citoid_data, new_td_cache = citeinspector.map_parsoid_to_templates(
-            raw_parsoid_data, wikitext_data, templatedata_cache,
+    citoid_data, new_td_cache = citeinspector.map_citoid_to_templates(
+            raw_citoid_data, wikitext_data, templatedata_cache,
             template_type_map, session)
 
     assert citoid_data is None
@@ -474,7 +474,7 @@ def test_citeinspector_citoidfail():
     ident = mock.MagicMock()
     ident.return_value = None
     with mock.patch('src.citeinspector.get_wikitext', m):
-        with mock.patch('src.citeinspector.get_parsoid_data', ident):
+        with mock.patch('src.citeinspector.get_citoid_data', ident):
             output, wikitext, meta = citeinspector.citeinspector('')
 
     assert wikitext

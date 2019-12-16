@@ -17,11 +17,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import hmac
 import logging
 import subprocess
-import requests
-import hmac
+
 import flask
+import requests
 
 bp = flask.Blueprint('deploy', __name__, url_prefix='/deploy')
 

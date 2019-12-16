@@ -17,9 +17,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pywikibot
-import mwparserfromhell as mwph
 import flask
+import mwparserfromhell as mwph
+import pywikibot
 import requests
 
 bp = flask.Blueprint('movecheck', __name__, url_prefix='/movecheck')

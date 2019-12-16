@@ -19,10 +19,11 @@
 
 import time
 import urllib.parse
-import requests
-import mwparserfromhell
-from stdnum import isbn
+
 import flask
+import mwparserfromhell
+import requests
+from stdnum import isbn
 
 bp = flask.Blueprint('hyphenator', __name__, url_prefix='/hyphenator')
 flash = []

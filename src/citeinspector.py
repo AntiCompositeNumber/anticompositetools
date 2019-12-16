@@ -17,14 +17,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import csv
+import logging
 import time
 import urllib.parse
 import uuid
-import csv
-import logging
-import requests
-import mwparserfromhell
+
 import flask
+import mwparserfromhell
+import requests
 from fuzzywuzzy import fuzz
 
 bp = flask.Blueprint('citeinspector', __name__, url_prefix='/citeinspector')
@@ -181,7 +182,7 @@ def get_bib_ident(cite_data):
                         'url')))))
 
 
-def get_parsoid_data(ident, session):
+def get_citoid_data(ident, session):
     rest_api = 'https://en.wikipedia.org/api/rest_v1/'
 
     url = f'{rest_api}data/citation/mediawiki/{urllib.parse.quote_plus(ident)}'
@@ -192,22 +193,22 @@ def get_parsoid_data(ident, session):
         return None
 
 
-def map_parsoid_to_templates(raw_parsoid_data, wikitext_data,
-                             templatedata_cache, template_type_map, session):
+def map_citoid_to_templates(raw_citoid_data, wikitext_data,
+                            templatedata_cache, template_type_map, session):
     try:
-        parsoid_template = template_type_map[raw_parsoid_data['itemType']]
+        citoid_template = template_type_map[raw_citoid_data['itemType']]
     except KeyError:
         return None, templatedata_cache
 
     try:
-        templatedata = templatedata_cache[parsoid_template]
+        templatedata = templatedata_cache[citoid_template]
     except KeyError:
-        templatedata = get_TemplateData_map(parsoid_template, session)
-        templatedata_cache[parsoid_template] = templatedata
+        templatedata = get_TemplateData_map(citoid_template, session)
+        templatedata_cache[citoid_template] = templatedata
     td_map = templatedata['maps']['citoid']
 
     data = {}
-    for key, value in raw_parsoid_data.items():
+    for key, value in raw_citoid_data.items():
         if key == "author":
             for i, author in enumerate(value):
                 if i == 0:
@@ -237,9 +238,9 @@ def map_parsoid_to_templates(raw_parsoid_data, wikitext_data,
     return (
         dict(
             name=wikitext_data['name'],
-            template=parsoid_template,
+            template=citoid_template,
             template_data=templatedata,
-            source=raw_parsoid_data.get('source', '[Citoid]')[0],
+            source=raw_citoid_data.get('source', '[Citoid]')[0],
             location=wikitext_data['location'],
             data=data
             ),
@@ -386,18 +387,18 @@ def citeinspector(url):
             # we've found identifiers, found to at least 2
             if found < 2:
                 found = 2
-            raw_parsoid_data = get_parsoid_data(ident.strip(), session)
+            raw_citoid_data = get_citoid_data(ident.strip(), session)
         else:  # pragma: no cover
             # These lines have tests, but get optomised out by the compiler
             # and therefore missed by coverage
             continue
 
-        if raw_parsoid_data is not None:
+        if raw_citoid_data is not None:
             # we've got citoid data, set found to at least 3
             if found < 3:
                 found = 3
-            parsoid_data, templatedata_cache = map_parsoid_to_templates(
-                raw_parsoid_data,
+            citoid_data, templatedata_cache = map_citoid_to_templates(
+                raw_citoid_data,
                 old_data,
                 templatedata_cache,
                 template_type_map,
@@ -406,7 +407,7 @@ def citeinspector(url):
         else:  # pragma: no cover
             continue
 
-        citedata = concat_items(old_data, parsoid_data)
+        citedata = concat_items(old_data, citoid_data)
         if citedata:
             # citoid and wikitext information were matched
             if found < 4:

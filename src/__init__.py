@@ -17,11 +17,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import base64
+import json
 import logging
 import os
-import json
-import base64
 import subprocess
+
 import flask
 
 logging.basicConfig(filename='act.log', level=logging.DEBUG)
