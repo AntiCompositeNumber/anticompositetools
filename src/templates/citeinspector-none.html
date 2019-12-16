@@ -16,6 +16,8 @@
         no bibliographic identifiers were found in the citation data. Citoid only supports URLs, DOIs, ISBNs, PMIDs, and PMCIDs.
       {% elif meta['not_found'] == 'data' -%}
         Citoid did not return any data for the citations on the page. Check your citations for dead links and misspelled identifiers.
+      {% elif meta['not_found'] == 'para' -%}
+        the templates used in the page did not match the templates expected by Citoid
       {% else -%}
         of an unknown error.
       {% endif %}</p>

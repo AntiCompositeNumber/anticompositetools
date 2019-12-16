@@ -27,13 +27,21 @@ import flask
 logging.basicConfig(filename='act.log', level=logging.DEBUG)
 
 
-def create_app():
+def create_app(test_config=None):
     app = flask.Flask(__name__)
 
     __dir__ = os.path.dirname(__file__)
-    app.config.update(json.load(open(os.path.join(__dir__, 'config.json'))))
-    app.secret_key = base64.b64decode(app.config['secret_key'])
-    app.config['secret_key'] = None
+    try:
+        conf = json.load(open(os.path.join(__dir__, 'config.json')))
+    except OSError:
+        if test_config:
+            app.config.update(test_config)
+        else:
+            raise
+    else:
+        app.config.update(conf)
+
+    app.secret_key = base64.b64decode(app.config.pop('secret_key'))
 
     rev = subprocess.run(['git', 'rev-parse', '--short', 'HEAD'],
                          universal_newlines=True, stdout=subprocess.PIPE,

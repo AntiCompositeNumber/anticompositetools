@@ -18,20 +18,16 @@
 # limitations under the License.
 
 import flask
-import unittest.mock as mock
 import sys
 import os
 sys.path.append(os.path.realpath(os.path.dirname(__file__)+"/.."))
-import src as anticompositetools  # noqa: E402
+import src  # noqa: E402
 
 
-def test_create_app():
-    m = mock.Mock()
-    n = mock.Mock()
-    m.return_value = {'secret_key': 'Test'}
-    with mock.patch('json.load', m):
-        with mock.patch('builtins.open', n):
-            app = anticompositetools.create_app()
+def client():
+    conf = {'secret_key': 'TestTest',
+            'TESTING': True}
+    app = src.create_app(test_config=conf)
 
     assert type(app) is flask.app.Flask
 

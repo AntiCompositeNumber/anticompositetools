@@ -30,12 +30,9 @@ import src  # noqa: E402
 
 @pytest.fixture
 def client():
-    m = mock.Mock()
-    n = mock.Mock()
-    m.return_value = {'secret_key': 'Test'}
-    with mock.patch('json.load', m):
-        with mock.patch('builtins.open', n):
-            app = src.create_app()
+    conf = {'secret_key': 'TestTest',
+            'TESTING': True}
+    app = src.create_app(test_config=conf)
 
     with app.test_client() as test_client:
         yield test_client
@@ -208,6 +205,93 @@ def test_lastnamefirstname_one():
     assert last == 'Jimbo'
 
 
+def test_concat_items():
+    wikitext_data = {
+        'data': {
+            'last1': 'Ipsum',
+            'first1': 'Lorem',
+            'access-date': '2019-12-31',
+            'isbn': '9781786751041'
+            },
+        'name': 'name',
+        'template': 'Cite book',
+        'location': 'ref',
+        'wikitext': 'foo'
+        }
+
+    citoid_data = {
+        'data': {
+            'last': 'Ipsum',
+            'first': 'Lorem',
+            'title': 'Foo Bar'
+            },
+        'template': 'Cite book',
+        'source': 'WorldCat',
+        'template_data': {
+            'params': {
+                'last': {'aliases': ['author', 'last1']},
+                'first': {'aliases': ['first1']},
+                'title': {},
+                # isbn ommitted
+                'access-date': {}
+                }
+            }
+        }
+
+    concat_data = {
+        'name': 'name',
+        'template': 'Cite book',
+        'citoid_source': 'WorldCat',
+        'location': 'ref',
+        'data': {
+            'last1': {
+                'wikitext': 'Ipsum',
+                'citoid': 'Ipsum',
+                'ratio': 100
+                },
+            'first1': {
+                'wikitext': 'Lorem',
+                'citoid': 'Lorem',
+                'ratio': 100
+                },
+            'title': {
+                'wikitext': '',
+                'citoid': 'Foo Bar',
+                'ratio': 0
+                },
+            'isbn': {
+                'wikitext': '9781786751041',
+                'citoid': '',
+                'ratio': 0
+                }
+            },
+        'wikitext': 'foo'
+        }
+
+    cite = citeinspector.concat_items(wikitext_data, citoid_data)
+
+    for key, value in concat_data.items():
+        assert cite.get(key) == value
+
+    assert not cite.get('access-date')
+
+
+def test_concat_items_badtemplate():
+    wikitext_data = {
+        'data': {},
+        'name': 'name',
+        'template': 'Cite web',
+        }
+
+    citoid_data = {
+        'data': {},
+        'template': 'Cite book',
+        }
+
+    cite = citeinspector.concat_items(wikitext_data, citoid_data)
+    assert cite is None
+
+
 def test_fuzz_item():
     assert citeinspector.fuzz_item('The Quick Brown Fox',
                                    'The Fantastic Mr. Fox') == 53
@@ -246,6 +330,62 @@ def test_get_parsoid_data_invalid_ident():
     assert data is None
 
 
+def test_map_parsoid_to_templates():
+    raw_parsoid_data = {
+        'ISBN': ['978-1-78675-104-1', '1-78675-104-6'],
+        'author': [
+            ['', 'Carroll, Lewis, 1832-1898,'],
+            ['', 'Ipsum, Lorem, 1970,']
+            ],
+        'editor': [
+            ['Dolor', 'Sit'],
+            ['Foo', 'Bar']
+            ],
+        'itemType': 'book',
+        'source': ['WorldCat'],
+        'title': "Alice's adventures in Wonderland"}
+    wikitext_data = {
+        'location': 'ref',
+        'name': 'fcabdd30-69ab-4a76-896d-982a4d61f6ca'}
+    template_data_cache = {}
+    template_type_map = {'book': 'Cite book'}
+    session = requests.Session()
+
+    citoid_data, new_td_cache = citeinspector.map_parsoid_to_templates(
+            raw_parsoid_data, wikitext_data, template_data_cache,
+            template_type_map, session)
+
+    assert type(citoid_data) is dict
+    assert citoid_data['template'] == 'Cite book'
+    assert citoid_data['source'] == 'WorldCat'
+
+    citedata = citoid_data['data']
+    assert citedata['last'] == 'Carroll'
+    assert citedata['first'] == 'Lewis'
+    assert citedata['last2'] == 'Ipsum'
+    assert citedata['first2'] == 'Lorem'
+    assert citedata['editor-last'] == 'Sit'
+    assert citedata['editor-first'] == 'Dolor'
+    assert citedata['editor2-last'] == 'Bar'
+    assert citedata['editor2-first'] == 'Foo'
+    assert citedata['title'] == "Alice's adventures in Wonderland"
+
+
+def test_map_parsoid_to_templates_notemplate():
+    raw_parsoid_data = {'itemType': 'magazine'}
+    wikitext_data = {}
+    templatedata_cache = {}
+    template_type_map = {'book': 'Cite book'}
+    session = requests.Session()
+
+    citoid_data, new_td_cache = citeinspector.map_parsoid_to_templates(
+            raw_parsoid_data, wikitext_data, templatedata_cache,
+            template_type_map, session)
+
+    assert citoid_data is None
+    assert new_td_cache == templatedata_cache
+
+
 def test_get_TemplateData_map():
     session = requests.Session()
     template = 'Cite web'
@@ -281,7 +421,100 @@ def test_get_retry_badmethod():
                                 method='delete')
 
 
+def test_citeinspector():
+    url = ('https://en.wikipedia.org/w/index.php?'
+           'title=User:AntiCompositeNumber/test_anticompositetools')
+    output, wikitext, meta = citeinspector.citeinspector(url)
+
+    with open('tests/testdata.txt') as f:
+        assert f.read() == wikitext
+
+    assert 'not_found' not in meta
+    for key in ['start_time', 'edit_time']:
+        assert key in meta
+
+    assert output
+    assert len(output) == 2
+
+
+def test_citeinspector_reffail():
+    m = mock.MagicMock()
+    with open('tests/testdata.txt') as f:
+        m.return_value = (f.read(), ('', ''))
+    ident = mock.MagicMock()
+    ident.return_value = []
+    with mock.patch('src.citeinspector.get_wikitext', m):
+        with mock.patch('src.citeinspector.find_refs', ident):
+            output, wikitext, meta = citeinspector.citeinspector('')
+
+    assert wikitext
+    assert not output
+    assert meta['not_found'] == 'refs'
+
+
+def test_citeinspector_identfail():
+    m = mock.MagicMock()
+    with open('tests/testdata.txt') as f:
+        m.return_value = (f.read(), ('', ''))
+    ident = mock.MagicMock()
+    ident.return_value = None
+    with mock.patch('src.citeinspector.get_wikitext', m):
+        with mock.patch('src.citeinspector.get_bib_ident', ident):
+            output, wikitext, meta = citeinspector.citeinspector('')
+
+    assert wikitext
+    assert not output
+    assert meta['not_found'] == 'ident'
+
+
+def test_citeinspector_citoidfail():
+    m = mock.MagicMock()
+    with open('tests/testdata.txt') as f:
+        m.return_value = (f.read(), ('', ''))
+    ident = mock.MagicMock()
+    ident.return_value = None
+    with mock.patch('src.citeinspector.get_wikitext', m):
+        with mock.patch('src.citeinspector.get_parsoid_data', ident):
+            output, wikitext, meta = citeinspector.citeinspector('')
+
+    assert wikitext
+    assert not output
+    assert meta['not_found'] == 'data'
+
+
+def test_citeinspector_concatfail():
+    m = mock.MagicMock()
+    with open('tests/testdata.txt') as f:
+        m.return_value = (f.read(), ('', ''))
+    ident = mock.MagicMock()
+    ident.return_value = None
+    with mock.patch('src.citeinspector.get_wikitext', m):
+        with mock.patch('src.citeinspector.concat_items', ident):
+            output, wikitext, meta = citeinspector.citeinspector('')
+
+    assert wikitext
+    assert not output
+    assert meta['not_found'] == 'para'
+
+
 def test_form(client):
     response = client.get('/citeinspector/')
     assert response.status_code == 200
     assert response.data
+
+
+def test_output(client):
+    form = {'page_url': 'User:AntiCompositeNumber/test_anticompositetools'}
+    response = client.post('/citeinspector/output', data=form)
+
+    assert response.status_code == 200
+    assert response.data
+
+
+def test_output_none(client):
+    form = {'page_url': 'User:AntiCompositeNumber'}
+    response = client.post('/citeinspector/output', data=form)
+
+    assert response.status_code == 404
+    assert response.data
+    assert b'CS1' in response.data

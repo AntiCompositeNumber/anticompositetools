@@ -197,7 +197,7 @@ def map_parsoid_to_templates(raw_parsoid_data, wikitext_data,
     try:
         parsoid_template = template_type_map[raw_parsoid_data['itemType']]
     except KeyError:
-        return None
+        return None, templatedata_cache
 
     try:
         templatedata = templatedata_cache[parsoid_template]
@@ -215,7 +215,7 @@ def map_parsoid_to_templates(raw_parsoid_data, wikitext_data,
                 else:
                     ordinal = str(i + 1)
                 last, first = lastnamefirstname(author)
-                if last:
+                if last:  # pragma: no branch
                     data[f'last{ordinal}'] = last
                     data[f'first{ordinal}'] = first
 
@@ -226,7 +226,7 @@ def map_parsoid_to_templates(raw_parsoid_data, wikitext_data,
                     ordinal = ''
                 else:
                     ordinal = str(i + 1)
-                if last:
+                if last:  # pragma: no branch
                     data[f'editor{ordinal}-last'] = last
                     data[f'editor{ordinal}-first'] = first
 
@@ -278,7 +278,11 @@ def concat_items(wikitext_data, citoid_data):
     ct_citedata = citoid_data['data']
     cite['name'] = wikitext_data['name']
     if wikitext_data['template'] == citoid_data['template']:
-        cite['template'] = [wikitext_data['template'], citoid_data['template']]
+        cite['template'] = citoid_data['template']
+    else:
+        # If the template that's there doesn't match the template that
+        # Citoid thinks should be there, the parameters won't match up.
+        return None
     cite['citoid_source'] = citoid_data['source']
     cite['location'] = wikitext_data['location']
     cite['ratio'] = fuzz_seq(wt_citedata.values(), ct_citedata.values())
@@ -383,7 +387,9 @@ def citeinspector(url):
             if found < 2:
                 found = 2
             raw_parsoid_data = get_parsoid_data(ident.strip(), session)
-        else:
+        else:  # pragma: no cover
+            # These lines have tests, but get optomised out by the compiler
+            # and therefore missed by coverage
             continue
 
         if raw_parsoid_data is not None:
@@ -397,18 +403,24 @@ def citeinspector(url):
                 template_type_map,
                 session
                 )
-        else:
+        else:  # pragma: no cover
             continue
 
         citedata = concat_items(old_data, parsoid_data)
-        output[old_data['name']] = citedata
+        if citedata:
+            # citoid and wikitext information were matched
+            if found < 4:
+                found = 4
+            output[old_data['name']] = citedata
+        else:  # pragma: no cover
+            continue
 
     meta['start_time'] = times[1]
     meta['edit_time'] = times[0]
-    if found < 3:
-        # When found < 3, something wasn't found.
+    if found < 4:
+        # When found < 4, something wasn't found.
         # Add what should have been found next to meta
-        meta['not_found'] = ('refs', 'ident', 'data')[found]
+        meta['not_found'] = ('refs', 'ident', 'data', 'para')[found]
     session.close()
 
     return output, wikitext, meta
@@ -430,7 +442,7 @@ def output():
         return flask.render_template('citeinspector-diff.html', d=output,
                                      wikitext=wikitext, meta=meta)
     else:
-        return flask.render_template('citeinspector-none.html', meta=meta)
+        return flask.render_template('citeinspector-none.html', meta=meta), 404
 
 
 @bp.route('/concat', methods=['POST'])
