@@ -72,9 +72,8 @@ def get_retry(url, session, method='get', output='object', data=None):
 
         except NotImplementedError:
             raise
-        except Exception as err:
+        except Exception:
             # TODO: Figure out which exceptions should be caught here.
-            print(err)
             if (response.status_code in [404, 400] or
                     response.text == 'upstream request timeout'):
 
@@ -196,7 +195,7 @@ def get_parsoid_data(ident, session):
 def map_parsoid_to_templates(raw_parsoid_data, wikitext_data,
                              templatedata_cache, template_type_map, session):
     try:
-        parsoid_template = template_type_map[raw_parsoid_data["itemType"]]
+        parsoid_template = template_type_map[raw_parsoid_data['itemType']]
     except KeyError:
         return None
 
@@ -351,12 +350,12 @@ def get_page_url(rawinput):
             title = query_params['title'][0]
         else:
             flash('Invalid URL', 'danger')
-            raise ValueError  # fix
+            raise ValueError
     elif '/wiki/' in parsed.path:
         title = parsed.path[6:]
     else:
         flash('Invalid URL', 'danger')
-        raise ValueError  # this one too
+        raise ValueError
 
     return f'https://{site}/w/index.php?title={title}', title
 
@@ -433,7 +432,6 @@ def concat():
             changes[cite_id][para] = value
 
     for cite_id, cite_data in changes.items():
-        print(code)
         cite_obj = code.filter(matches=data[cite_id]['wikitext'])
         for obj in cite_obj:
             if obj != data[cite_id]['wikitext']:
@@ -444,9 +442,7 @@ def concat():
                 cite_template = obj
 
             for para, value in cite_data.items():
-                print(cite_template)
                 cite_template.add(para, value)
-                print(cite_template)
 
     submit_url = f'{meta["url"]}&action=submit'
     return flask.render_template('citeinspector-redirect.html',
