@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block title %}CiteInspector{% endblock %}
+{% block head %}
+  {{ super() }}
+  <style type="text/css">
+    .important { color: #336699; }
+  </style>
+{% endblock %}
+{% block content %}
+  <h1>No citations found!</h1>
+  <div>
+      <p>No citation data was found for <a href="{{meta['url']}}">{{meta['title']}}</a> because
+      {% if meta['not_found'] == 'refs' -%}
+        no <a href="https://en.wikipedia.org/wiki/Help:Citation_Style_1">CS1</a> citations were found on the page.
+      {% elif meta['not_found'] == 'ident' -%}
+        no bibliographic identifiers were found in the citation data. Citoid only supports URLs, DOIs, ISBNs, PMIDs, and PMCIDs.
+      {% elif meta['not_found'] == 'data' -%}
+        Citoid did not return any data for the citations on the page. Check your citations for dead links and misspelled identifiers.
+      {% else -%}
+        of an unknown error.
+      {% endif %}</p>
+  </div>
+{% endblock %}

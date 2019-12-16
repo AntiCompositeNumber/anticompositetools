@@ -45,7 +45,9 @@ def test_get_page_url_page():
     page = 'User:AntiCompositeNumber/test_anticompositetools'
     url = ('https://en.wikipedia.org/w/index.php?'
            'title=User:AntiCompositeNumber/test_anticompositetools')
-    assert citeinspector.get_page_url(page) == url
+    out = citeinspector.get_page_url(page)
+    assert out[0] == url
+    assert out[1] == page
 
 
 def test_get_page_url_wiki():
@@ -54,7 +56,7 @@ def test_get_page_url_wiki():
     url = ('https://en.wikipedia.org/w/index.php?'
            'title=User:AntiCompositeNumber/test_anticompositetools')
 
-    assert citeinspector.get_page_url(input_url) == url
+    assert citeinspector.get_page_url(input_url)[0] == url
 
 
 def test_get_page_url_w():
@@ -63,7 +65,7 @@ def test_get_page_url_w():
     url = ('https://en.wikipedia.org/w/index.php?'
            'title=User:AntiCompositeNumber/test_anticompositetools')
 
-    assert citeinspector.get_page_url(input_url) == url
+    assert citeinspector.get_page_url(input_url)[0] == url
 
 
 def test_get_page_url_notitle():

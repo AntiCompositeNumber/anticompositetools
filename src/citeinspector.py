@@ -369,16 +369,27 @@ def citeinspector(url):
     templatedata_cache = {}
     output = {}
     meta = {}
+    found = 0
     code = mwparserfromhell.parse(wikitext)
 
     for old_data in find_refs(code, supported_templates):
+        # we've found citation data, found to at least 1
+        if found < 1:
+            found = 1
+
         ident = get_bib_ident(old_data)
         if ident:
+            # we've found identifiers, found to at least 2
+            if found < 2:
+                found = 2
             raw_parsoid_data = get_parsoid_data(ident.strip(), session)
         else:
             continue
 
         if raw_parsoid_data is not None:
+            # we've got citoid data, set found to at least 3
+            if found < 3:
+                found = 3
             parsoid_data, templatedata_cache = map_parsoid_to_templates(
                 raw_parsoid_data,
                 old_data,
@@ -388,11 +399,16 @@ def citeinspector(url):
                 )
         else:
             continue
+
         citedata = concat_items(old_data, parsoid_data)
         output[old_data['name']] = citedata
 
     meta['start_time'] = times[1]
     meta['edit_time'] = times[0]
+    if found < 3:
+        # When found < 3, something wasn't found.
+        # Add what should have been found next to meta
+        meta['not_found'] = ('refs', 'ident', 'data')[found]
     session.close()
 
     return output, wikitext, meta
@@ -406,11 +422,15 @@ def form():
 @bp.route('/output', methods=['POST'])
 def output():
     rawinput = flask.request.form['page_url']
-    url = get_page_url(rawinput)
+    url, title = get_page_url(rawinput)
     output, wikitext, meta = citeinspector(url)
     meta['url'] = url
-    return flask.render_template('citeinspector-diff.html', d=output,
-                                 wikitext=wikitext, meta=meta)
+    meta['title'] = title
+    if len(output):
+        return flask.render_template('citeinspector-diff.html', d=output,
+                                     wikitext=wikitext, meta=meta)
+    else:
+        return flask.render_template('citeinspector-none.html', meta=meta)
 
 
 @bp.route('/concat', methods=['POST'])
