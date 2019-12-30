@@ -52,12 +52,13 @@ def create_app(test_config=None):
     )
     app.config["version"] = rev.stdout
 
-    from . import hyphenator, citeinspector, deploy, movecheck
+    from . import hyphenator, citeinspector, deploy, movecheck, paracheck
 
     app.register_blueprint(hyphenator.bp)
     app.register_blueprint(citeinspector.bp)
     app.register_blueprint(deploy.bp)
     app.register_blueprint(movecheck.bp)
+    app.register_blueprint(paracheck.bp)
 
     @app.route("/")
     def index():
