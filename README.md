@@ -1,5 +1,9 @@
 # AntiCompositeTools
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/AntiCompositeNumber/anticompositetools/Python%20application) ![Uptime Robot status](https://img.shields.io/uptimerobot/status/m783972628-037856cb670609254a10c883?label=website%20status) [![Coverage Status](https://coveralls.io/repos/github/AntiCompositeNumber/anticompositetools/badge.svg?branch=master)](https://coveralls.io/github/AntiCompositeNumber/anticompositetools?branch=master)![GitHub Pipenv locked Python version](https://img.shields.io/github/pipenv/locked/python-version/AntiCompositeNumber/anticompositetools)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/AntiCompositeNumber/anticompositetools/Python%20application)
+![Uptime Robot status](https://img.shields.io/uptimerobot/status/m783972628-037856cb670609254a10c883?label=website%20status)
+[![Coverage Status](https://coveralls.io/repos/github/AntiCompositeNumber/anticompositetools/badge.svg?branch=master)](https://coveralls.io/github/AntiCompositeNumber/anticompositetools?branch=master)
+![GitHub Pipenv locked Python version](https://img.shields.io/github/pipenv/locked/python-version/AntiCompositeNumber/anticompositetools)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 A group of tools built for the English Wikipedia and other Wikimedia projects, written in Python using Flask and running on Wikimedia Toolforge.
 

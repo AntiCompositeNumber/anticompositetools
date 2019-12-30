@@ -24,19 +24,24 @@ import subprocess
 import flask
 import requests
 
-bp = flask.Blueprint('deploy', __name__, url_prefix='/deploy')
+bp = flask.Blueprint("deploy", __name__, url_prefix="/deploy")
 
 
 def pull_master():
-    logging.info('Pulling from git repository')
+    logging.info("Pulling from git repository")
     try:
         pull = subprocess.run(
-            ['git', '-C',
-             '/data/project/anticompositetools/anticompositetools/',
-             'pull'],
+            [
+                "git",
+                "-C",
+                "/data/project/anticompositetools/anticompositetools/",
+                "pull",
+            ],
             check=True,
-            universal_newlines=True, stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE)
+            universal_newlines=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
     except subprocess.CalledProcessError as cpe:
         logging.debug(pull.stdout)
         logging.error(pull.stderr)
@@ -49,59 +54,59 @@ def pull_master():
 
 
 def restart_webservice():
-    logging.info('Webservice restarting!')
-    subprocess.Popen(['webservice', 'restart'])
+    logging.info("Webservice restarting!")
+    subprocess.Popen(["webservice", "restart"])
 
 
 def update_status(url, status, auth):
-    payload = {'state': status}
-    headers = {'Accept': 'application/vnd.github.flash-preview+json'}
+    payload = {"state": status}
+    headers = {"Accept": "application/vnd.github.flash-preview+json"}
     response = requests.post(url, auth=auth, json=payload, headers=headers)
     logging.debug(response.text)
     return response.status_code == 201
 
 
 def deploy(request, payload):
-    logging.info('Deployment starting')
+    logging.info("Deployment starting")
     logging.debug(payload)
-    auth = ('AntiCompositeNumber',
-            flask.current_app.config['github_deploy_pat'])
-    status_url = payload['deployment']['statuses_url']
+    auth = ("AntiCompositeNumber", flask.current_app.config["github_deploy_pat"])
+    status_url = payload["deployment"]["statuses_url"]
     if pull_master():
-        update_status(status_url, 'success', auth)
+        update_status(status_url, "success", auth)
         restart_webservice()
         return True
     else:
-        update_status(status_url, 'error', auth)
+        update_status(status_url, "error", auth)
         return False
 
 
 def check_status(payload):
-    return payload.get('deployment_status', {}).get('state') == 'pending'
+    return payload.get("deployment_status", {}).get("state") == "pending"
 
 
 def verify_hmac(request):
     config = flask.current_app.config
-    r_hmac = hmac.new((config['github_secret']).encode(),
-                      msg=request.get_data(), digestmod='sha1')
-    r_digest = 'sha1=' + r_hmac.hexdigest()
-    g_digest = request.headers['X-Hub-Signature']
+    r_hmac = hmac.new(
+        (config["github_secret"]).encode(), msg=request.get_data(), digestmod="sha1"
+    )
+    r_digest = "sha1=" + r_hmac.hexdigest()
+    g_digest = request.headers["X-Hub-Signature"]
     return hmac.compare_digest(r_digest, g_digest)
 
 
-@bp.route('/', methods=['POST'])
+@bp.route("/", methods=["POST"])
 def autodeploy():
     request = flask.request
-    logging.debug('Request:' + str(request.__dict__))
-    logging.debug('Request JSON:' + str(request.json))
+    logging.debug("Request:" + str(request.__dict__))
+    logging.debug("Request JSON:" + str(request.json))
     if check_status(request.json) and verify_hmac(request):
         try:
             deploy_result = deploy(request, request.json)
         except Exception as problem:
             logging.error(problem)
-            return 'Exception while deploying:\n' + str(problem), 500
+            return "Exception while deploying:\n" + str(problem), 500
         if deploy_result:
-            return '', 204
+            return "", 204
         else:
             flask.abort(504)
     else:

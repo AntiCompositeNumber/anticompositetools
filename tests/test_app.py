@@ -21,19 +21,20 @@ import flask
 import unittest.mock as mock
 import sys
 import os
-sys.path.append(os.path.realpath(os.path.dirname(__file__)+"/.."))
+
+sys.path.append(os.path.realpath(os.path.dirname(__file__) + "/.."))
 
 
 def test_app():
     m = mock.Mock()
     n = mock.Mock()
-    m.return_value = {'secret_key': 'Test'}
-    with mock.patch('json.load', m):
-        with mock.patch('builtins.open', n):
+    m.return_value = {"secret_key": "Test"}
+    with mock.patch("json.load", m):
+        with mock.patch("builtins.open", n):
             from src.app import app
     assert type(app) is flask.app.Flask
 
     with app.test_client() as client:
-        r = client.get('/')
+        r = client.get("/")
         assert r.status_code == 200
         assert r.data is not None

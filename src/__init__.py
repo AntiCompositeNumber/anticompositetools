@@ -25,7 +25,7 @@ import subprocess
 
 import flask
 
-logging.basicConfig(filename='act.log', level=logging.DEBUG)
+logging.basicConfig(filename="act.log", level=logging.DEBUG)
 
 
 def create_app(test_config=None):
@@ -33,7 +33,7 @@ def create_app(test_config=None):
 
     __dir__ = os.path.dirname(__file__)
     try:
-        conf = json.load(open(os.path.join(__dir__, 'config.json')))
+        conf = json.load(open(os.path.join(__dir__, "config.json")))
     except OSError:
         if test_config:
             app.config.update(test_config)
@@ -42,21 +42,25 @@ def create_app(test_config=None):
     else:
         app.config.update(conf)
 
-    app.secret_key = base64.b64decode(app.config.pop('secret_key'))
+    app.secret_key = base64.b64decode(app.config.pop("secret_key"))
 
-    rev = subprocess.run(['git', 'rev-parse', '--short', 'HEAD'],
-                         universal_newlines=True, stdout=subprocess.PIPE,
-                         stderr=subprocess.PIPE)
-    app.config['version'] = rev.stdout
+    rev = subprocess.run(
+        ["git", "rev-parse", "--short", "HEAD"],
+        universal_newlines=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    app.config["version"] = rev.stdout
 
     from . import hyphenator, citeinspector, deploy, movecheck
+
     app.register_blueprint(hyphenator.bp)
     app.register_blueprint(citeinspector.bp)
     app.register_blueprint(deploy.bp)
     app.register_blueprint(movecheck.bp)
 
-    @app.route('/')
+    @app.route("/")
     def index():
-        return flask.render_template('index.html')
+        return flask.render_template("index.html")
 
     return app

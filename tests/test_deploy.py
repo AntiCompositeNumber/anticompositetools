@@ -23,18 +23,19 @@
 import unittest.mock as mock
 import sys
 import os
-sys.path.append(os.path.realpath(os.path.dirname(__file__)+"/.."))
+
+sys.path.append(os.path.realpath(os.path.dirname(__file__) + "/.."))
 import src.deploy as deploy  # noqa: E402
 
 
 def test_check_status():
-    payload = {'deployment_status': {'state': 'pending'}}
+    payload = {"deployment_status": {"state": "pending"}}
     assert deploy.check_status(payload)
 
 
 def test_restart_webservice():
     m = mock.MagicMock()
-    with mock.patch('subprocess.Popen', m):
+    with mock.patch("subprocess.Popen", m):
         d = deploy.restart_webservice()
     assert d is None
-    m.assert_called_once_with(['webservice', 'restart'])
+    m.assert_called_once_with(["webservice", "restart"])

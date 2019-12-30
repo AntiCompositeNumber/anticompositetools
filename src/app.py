@@ -19,6 +19,7 @@
 
 import os
 import sys
+
 sys.path.append(os.getcwd()[:-4])
 from src import create_app  # noqa E402
 

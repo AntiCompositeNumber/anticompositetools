@@ -8,6 +8,8 @@ flake8 = "*"
 pytest = "*"
 coveralls = "*"
 pipenv-to-requirements = "*"
+black = "*"
+mypy = "*"
 
 [packages]
 certifi = "*"
@@ -32,3 +34,6 @@ requests-oauthlib = "*"
 
 [requires]
 python_version = "3.7"
+
+[pipenv]
+allow_prereleases = true

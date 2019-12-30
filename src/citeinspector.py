@@ -28,7 +28,7 @@ import mwparserfromhell
 import requests
 from fuzzywuzzy import fuzz
 
-bp = flask.Blueprint('citeinspector', __name__, url_prefix='/citeinspector')
+bp = flask.Blueprint("citeinspector", __name__, url_prefix="/citeinspector")
 
 
 class HandledError(Exception):
@@ -38,6 +38,7 @@ class HandledError(Exception):
         orig_type -- Original exception type
         message -- Additional message (optional)
         """
+
     def __init__(self, orig_type, message=None):
         self.orig_type = orig_type
         self.message = message
@@ -47,81 +48,85 @@ def flash(message, category="message"):
     try:
         flask.flash(message, category)
     except RuntimeError:
-        print(category + ':', message)
+        print(category + ":", message)
 
 
-def get_retry(url, session, method='get', output='object', data=None):
+def get_retry(url, session, method="get", output="object", data=None):
     """Make a request for a resource and retry if that doesn't work."""
-    headers = {'user-agent': 'anticompositetools/citeinspector '
-               '(https://tools.wmflabs.org/anticompositetools/citeinspector; '
-               'tools.anticompositetools@tools.wmflabs.org) python-requests/'
-               + requests.__version__}
+    headers = {
+        "user-agent": "anticompositetools/citeinspector "
+        "(https://tools.wmflabs.org/anticompositetools/citeinspector; "
+        "tools.anticompositetools@tools.wmflabs.org) python-requests/"
+        + requests.__version__
+    }
 
     for i in range(1, 5):  # pragma: no branch
         try:
-            if method == 'get':
+            if method == "get":
                 response = session.get(url, headers=headers)
-            elif method == 'post':
+            elif method == "post":
                 response = session.post(url, headers=headers, data=data)
             else:
                 raise NotImplementedError
 
             response.raise_for_status()
 
-            if output == 'json':
+            if output == "json":
                 output_json = response.json()
 
         except NotImplementedError:
             raise
         except Exception:
             # TODO: Figure out which exceptions should be caught here.
-            if (response.status_code in [404, 400] or
-                    response.text == 'upstream request timeout'):
+            if (
+                response.status_code in [404, 400]
+                or response.text == "upstream request timeout"
+            ):
 
-                if output == 'object':
+                if output == "object":
                     return response
                 else:
                     return None
             elif i == 4:
                 raise
             else:
-                time.sleep(5*i)
+                time.sleep(5 * i)
                 continue
         else:
             break
 
-    if output == 'json':
+    if output == "json":
         return output_json
     else:
         return response
 
 
 def get_wikitext(url, session):
-    wikitext_url = f'{url}&action=raw'
+    wikitext_url = f"{url}&action=raw"
 
     request = get_retry(wikitext_url, session)
     if request.status_code == 404:
-        flash('That page does not exist.', 'danger')
-        raise HandledError('404 Client Error')
+        flash("That page does not exist.", "danger")
+        raise HandledError("404 Client Error")
 
     else:
-        start_time = time.strftime('%Y%m%d%H%M%S', time.gmtime())
-        timestruct = time.strptime(request.headers['Last-Modified'],
-                                   '%a, %d %b %Y %H:%M:%S %Z')
-        edit_time = time.strftime('%Y%m%d%H%M%S', timestruct)
+        start_time = time.strftime("%Y%m%d%H%M%S", time.gmtime())
+        timestruct = time.strptime(
+            request.headers["Last-Modified"], "%a, %d %b %Y %H:%M:%S %Z"
+        )
+        edit_time = time.strftime("%Y%m%d%H%M%S", timestruct)
         return (request.text, (edit_time, start_time))
 
 
 def get_citoid_template_types(session):
     """Loads template to citoid type mapping from wiki"""
-    url = (
-        f'{get_page_url("MediaWiki:Citoid-template-type-map.json")[0]}'
-        '&action=raw'
-        )
-    template_type_map = get_retry(url=url, session=session, output='json')
-    supported_templates = [template for key, template
-                           in template_type_map.items()
-                           if template != 'Citation']
+    url = f'{get_page_url("MediaWiki:Citoid-template-type-map.json")[0]}' "&action=raw"
+    template_type_map = get_retry(url=url, session=session, output="json")
+    supported_templates = [
+        template
+        for key, template in template_type_map.items()
+        if template != "Citation"
+    ]
 
     return template_type_map, supported_templates
 
@@ -133,30 +138,40 @@ def find_refs(code, supported_templates):
         if tag.contents.filter_templates():
             # Ignore self-closed, unparsable, and empty tags
             cite_data, template_name = grab_cite_data(
-                tag.contents.filter_templates()[0], supported_templates)
+                tag.contents.filter_templates()[0], supported_templates
+            )
             if cite_data is not None:
                 try:
                     # If the reference is already named, use that.
-                    ref_id = tag.get('name').value
+                    ref_id = tag.get("name").value
                 except ValueError:
                     # Otherwise, grab a uuid to use in place of the name
                     ref_id = uuid.uuid4()
 
-                yield dict(name=str(ref_id), template=template_name,
-                           source='wikitext', location='ref',
-                           wikitext=str(tag), data=cite_data)
+                yield dict(
+                    name=str(ref_id),
+                    template=template_name,
+                    source="wikitext",
+                    location="ref",
+                    wikitext=str(tag),
+                    data=cite_data,
+                )
 
     # Check for citation templates elsewhere in the text
     for template in code.ifilter_templates(recursive=False):
-        cite_data, template_name = grab_cite_data(template,
-                                                  supported_templates)
+        cite_data, template_name = grab_cite_data(template, supported_templates)
         if cite_data is not None:
             # We could generate a Harvard anchor here, but I don't trust
             # that to be unique
             ref_id = uuid.uuid4()
-            yield dict(name=str(ref_id), template=template_name,
-                       source='wikitext', location='text',
-                       wikitext=str(template), data=cite_data)
+            yield dict(
+                name=str(ref_id),
+                template=template_name,
+                source="wikitext",
+                location="text",
+                wikitext=str(template),
+                data=cite_data,
+            )
 
 
 def grab_cite_data(template, supported_templates):
@@ -164,8 +179,11 @@ def grab_cite_data(template, supported_templates):
     template_name = str(template.name).lower().strip().capitalize()
 
     if template_name in supported_templates:
-        data = {str(para.name).lower().strip(): str(para.value)
-                for para in template.params if para.value.strip()}
+        data = {
+            str(para.name).lower().strip(): str(para.value)
+            for para in template.params
+            if para.value.strip()
+        }
         return data, template_name
     else:
         return None, None
@@ -173,30 +191,28 @@ def grab_cite_data(template, supported_templates):
 
 def get_bib_ident(cite_data):
     """Return the best identifier (ISBN, DOI, PMID, PMCID, or URL)"""
-    data = cite_data['data']
+    data = cite_data["data"]
     return data.get(
-        'isbn', data.get(
-            'pmcid', data.get(
-                'pmid', data.get(
-                    'doi', data.get(
-                        'url')))))
+        "isbn", data.get("pmcid", data.get("pmid", data.get("doi", data.get("url"))))
+    )
 
 
 def get_citoid_data(ident, session):
-    rest_api = 'https://en.wikipedia.org/api/rest_v1/'
+    rest_api = "https://en.wikipedia.org/api/rest_v1/"
 
-    url = f'{rest_api}data/citation/mediawiki/{urllib.parse.quote_plus(ident)}'
-    data = get_retry(url, session, output='json')
+    url = f"{rest_api}data/citation/mediawiki/{urllib.parse.quote_plus(ident)}"
+    data = get_retry(url, session, output="json")
     if data is not None:
         return data[0]
     else:
         return None
 
 
-def map_citoid_to_templates(raw_citoid_data, wikitext_data,
-                            templatedata_cache, template_type_map, session):
+def map_citoid_to_templates(
+    raw_citoid_data, wikitext_data, templatedata_cache, template_type_map, session
+):
     try:
-        citoid_template = template_type_map[raw_citoid_data['itemType']]
+        citoid_template = template_type_map[raw_citoid_data["itemType"]]
     except KeyError:
         return None, templatedata_cache
 
@@ -205,31 +221,31 @@ def map_citoid_to_templates(raw_citoid_data, wikitext_data,
     except KeyError:
         templatedata = get_TemplateData_map(citoid_template, session)
         templatedata_cache[citoid_template] = templatedata
-    td_map = templatedata['maps']['citoid']
+    td_map = templatedata["maps"]["citoid"]
 
     data = {}
     for key, value in raw_citoid_data.items():
         if key == "author":
             for i, author in enumerate(value):
                 if i == 0:
-                    ordinal = ''
+                    ordinal = ""
                 else:
                     ordinal = str(i + 1)
                 last, first = lastnamefirstname(author)
                 if last:  # pragma: no branch
-                    data[f'last{ordinal}'] = last
-                    data[f'first{ordinal}'] = first
+                    data[f"last{ordinal}"] = last
+                    data[f"first{ordinal}"] = first
 
         elif key == "editor":
             for i, author in enumerate(value):
                 last, first = lastnamefirstname(author)
                 if i == 0:
-                    ordinal = ''
+                    ordinal = ""
                 else:
                     ordinal = str(i + 1)
                 if last:  # pragma: no branch
-                    data[f'editor{ordinal}-last'] = last
-                    data[f'editor{ordinal}-first'] = first
+                    data[f"editor{ordinal}-last"] = last
+                    data[f"editor{ordinal}-first"] = first
 
         elif type(value) is str:
             param = td_map.get(key)
@@ -237,15 +253,15 @@ def map_citoid_to_templates(raw_citoid_data, wikitext_data,
                 data[param] = value
     return (
         dict(
-            name=wikitext_data['name'],
+            name=wikitext_data["name"],
             template=citoid_template,
             template_data=templatedata,
-            source=raw_citoid_data.get('source', '[Citoid]')[0],
-            location=wikitext_data['location'],
-            data=data
-            ),
-        templatedata_cache
-        )
+            source=raw_citoid_data.get("source", "[Citoid]")[0],
+            location=wikitext_data["location"],
+            data=data,
+        ),
+        templatedata_cache,
+    )
 
 
 def lastnamefirstname(author):
@@ -256,45 +272,47 @@ def lastnamefirstname(author):
         if len(parsed) >= 2:
             return parsed[0], parsed[1]
         else:
-            return author[1], ''
+            return author[1], ""
     else:
         return author[1], author[0]
 
 
 def get_TemplateData_map(template, session):
-    mw_api = 'https://en.wikipedia.org/w/api.php'
-    request_body = dict(action='templatedata', format='json',
-                        titles='Template:' + template)
+    mw_api = "https://en.wikipedia.org/w/api.php"
+    request_body = dict(
+        action="templatedata", format="json", titles="Template:" + template
+    )
 
-    templatedata = get_retry(mw_api, session, method='post', output='json',
-                             data=request_body)
-    pages = templatedata['pages']
+    templatedata = get_retry(
+        mw_api, session, method="post", output="json", data=request_body
+    )
+    pages = templatedata["pages"]
     return pages[list(pages)[0]]
 
 
 def concat_items(wikitext_data, citoid_data):
     """Zip wikitext and citoid data together"""
     cite = {}
-    wt_citedata = wikitext_data['data']
-    ct_citedata = citoid_data['data']
-    cite['name'] = wikitext_data['name']
-    if wikitext_data['template'] == citoid_data['template']:
-        cite['template'] = citoid_data['template']
+    wt_citedata = wikitext_data["data"]
+    ct_citedata = citoid_data["data"]
+    cite["name"] = wikitext_data["name"]
+    if wikitext_data["template"] == citoid_data["template"]:
+        cite["template"] = citoid_data["template"]
     else:
         # If the template that's there doesn't match the template that
         # Citoid thinks should be there, the parameters won't match up.
         return None
-    cite['citoid_source'] = citoid_data['source']
-    cite['location'] = wikitext_data['location']
-    cite['ratio'] = fuzz_seq(wt_citedata.values(), ct_citedata.values())
-    cite['data'] = {}
+    cite["citoid_source"] = citoid_data["source"]
+    cite["location"] = wikitext_data["location"]
+    cite["ratio"] = fuzz_seq(wt_citedata.values(), ct_citedata.values())
+    cite["data"] = {}
 
-    templatedata = citoid_data['template_data']
+    templatedata = citoid_data["template_data"]
     keys = list(wt_citedata)
     for key in ct_citedata:
         if key not in keys:
             # Switch key from citoid to param alias used in wikitext
-            aliases = templatedata['params'].get(key, {}).get('aliases', [])
+            aliases = templatedata["params"].get(key, {}).get("aliases", [])
             for alias in aliases:
                 if alias in keys:
                     ct_citedata[alias] = ct_citedata.pop(key)
@@ -303,18 +321,18 @@ def concat_items(wikitext_data, citoid_data):
                 keys.append(key)
 
     for key in keys:
-        if key == 'access-date':
+        if key == "access-date":
             # Ignore access date, shouldn't be changed for metadata changes
             continue
-        wt_value = wt_citedata.get(key, '')
-        ct_value = ct_citedata.get(key, '')
-        cite['data'][key] = {
-            'wikitext': wt_value,
-            'citoid': ct_value,
-            'ratio': fuzz_item(wt_value, ct_value)
-            }
+        wt_value = wt_citedata.get(key, "")
+        ct_value = ct_citedata.get(key, "")
+        cite["data"][key] = {
+            "wikitext": wt_value,
+            "citoid": ct_value,
+            "ratio": fuzz_item(wt_value, ct_value),
+        }
 
-    cite['wikitext'] = wikitext_data['wikitext']
+    cite["wikitext"] = wikitext_data["wikitext"]
 
     return cite
 
@@ -324,12 +342,12 @@ def fuzz_item(item_a, item_b):
 
 
 def fuzz_seq(set_a, set_b):
-    str_a = ''
-    str_b = ''
+    str_a = ""
+    str_b = ""
     for item in set_a:
-        str_a += item + ' '
+        str_a += item + " "
     for item in set_b:
-        str_b += item + ' '
+        str_b += item + " "
     return fuzz.token_set_ratio(str_a, str_b)
 
 
@@ -341,33 +359,32 @@ def get_page_url(rawinput):
     parsed = urllib.parse.urlparse(rawinput)
 
     site = parsed.netloc
-    if 'http' not in parsed.scheme:
+    if "http" not in parsed.scheme:
         # Assume page on enwiki
         title = rawinput
-        site = 'en.wikipedia.org'
-    elif site != 'en.wikipedia.org':
-        flash('Sorry, but only the English Wikipedia is supported right now',
-              'danger')
+        site = "en.wikipedia.org"
+    elif site != "en.wikipedia.org":
+        flash("Sorry, but only the English Wikipedia is supported right now", "danger")
         raise ValueError
-    elif parsed.path == '/w/index.php':
+    elif parsed.path == "/w/index.php":
         query_params = urllib.parse.parse_qs(parsed.query)
-        if 'oldid' not in query_params:
-            title = query_params['title'][0]
+        if "oldid" not in query_params:
+            title = query_params["title"][0]
         else:
-            flash('Invalid URL', 'danger')
+            flash("Invalid URL", "danger")
             raise ValueError
-    elif '/wiki/' in parsed.path:
+    elif "/wiki/" in parsed.path:
         title = parsed.path[6:]
     else:
-        flash('Invalid URL', 'danger')
+        flash("Invalid URL", "danger")
         raise ValueError
 
-    return f'https://{site}/w/index.php?title={title}', title
+    return f"https://{site}/w/index.php?title={title}", title
 
 
 def citeinspector(url):
     session = requests.Session()
-    logging.info('Processing new page: ' + url)
+    logging.info("Processing new page: " + url)
     wikitext, times = get_wikitext(url, session)
     template_type_map, supported_templates = get_citoid_template_types(session)
 
@@ -402,8 +419,8 @@ def citeinspector(url):
                 old_data,
                 templatedata_cache,
                 template_type_map,
-                session
-                )
+                session,
+            )
         else:  # pragma: no cover
             continue
 
@@ -412,52 +429,53 @@ def citeinspector(url):
             # citoid and wikitext information were matched
             if found < 4:
                 found = 4
-            output[old_data['name']] = citedata
+            output[old_data["name"]] = citedata
         else:  # pragma: no cover
             continue
 
-    meta['start_time'] = times[1]
-    meta['edit_time'] = times[0]
+    meta["start_time"] = times[1]
+    meta["edit_time"] = times[0]
     if found < 4:
         # When found < 4, something wasn't found.
         # Add what should have been found next to meta
-        meta['not_found'] = ('refs', 'ident', 'data', 'para')[found]
+        meta["not_found"] = ("refs", "ident", "data", "para")[found]
     session.close()
 
     return output, wikitext, meta
 
 
-@bp.route('/', methods=['GET'])
+@bp.route("/", methods=["GET"])
 def form():
-    return flask.render_template('citeinspector.html')
+    return flask.render_template("citeinspector.html")
 
 
-@bp.route('/output', methods=['POST'])
+@bp.route("/output", methods=["POST"])
 def output():
-    rawinput = flask.request.form['page_url']
+    rawinput = flask.request.form["page_url"]
     url, title = get_page_url(rawinput)
     output, wikitext, meta = citeinspector(url)
-    meta['url'] = url
-    meta['title'] = title
+    meta["url"] = url
+    meta["title"] = title
     if len(output):
-        return flask.render_template('citeinspector-diff.html', d=output,
-                                     wikitext=wikitext, meta=meta)
+        return flask.render_template(
+            "citeinspector-diff.html", d=output, wikitext=wikitext, meta=meta
+        )
     else:
-        return flask.render_template('citeinspector-none.html', meta=meta), 404
+        return flask.render_template("citeinspector-none.html", meta=meta), 404
 
 
-@bp.route('/concat', methods=['POST'])
+@bp.route("/concat", methods=["POST"])
 def concat():
-    data = flask.json.loads(flask.request.form['data'])
-    meta = flask.json.loads(flask.request.form['meta'])
-    wikitext = flask.request.form['wikitext']
+    data = flask.json.loads(flask.request.form["data"])
+    meta = flask.json.loads(flask.request.form["meta"])
+    wikitext = flask.request.form["wikitext"]
     code = mwparserfromhell.parse(wikitext)
     changes = {}
     for key, value in flask.request.form.items():
-        if key in ['wikitext', 'data', 'meta'] or value == '':
+        if key in ["wikitext", "data", "meta"] or value == "":
             continue
-        cite_id, sep, para = key.rpartition('/')
-        if sep != '/':
+        cite_id, sep, para = key.rpartition("/")
+        if sep != "/":
             continue
         else:
             if cite_id not in changes:
@@ -465,9 +483,9 @@ def concat():
             changes[cite_id][para] = value
 
     for cite_id, cite_data in changes.items():
-        cite_obj = code.filter(matches=data[cite_id]['wikitext'])
+        cite_obj = code.filter(matches=data[cite_id]["wikitext"])
         for obj in cite_obj:
-            if obj != data[cite_id]['wikitext']:
+            if obj != data[cite_id]["wikitext"]:
                 continue
             elif type(obj) == mwparserfromhell.nodes.tag.Tag:
                 cite_template = obj.contents.filter_templates()[0]
@@ -478,7 +496,10 @@ def concat():
                 cite_template.add(para, value)
 
     submit_url = f'{meta["url"]}&action=submit'
-    return flask.render_template('citeinspector-redirect.html',
-                                 submit_url=submit_url, newtext=str(code),
-                                 start_time=meta['start_time'],
-                                 edit_time=meta['edit_time'])
+    return flask.render_template(
+        "citeinspector-redirect.html",
+        submit_url=submit_url,
+        newtext=str(code),
+        start_time=meta["start_time"],
+        edit_time=meta["edit_time"],
+    )
