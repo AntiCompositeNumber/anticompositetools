@@ -57,13 +57,17 @@ def get_new_category_pages(
               pages are listed between (now + period) and now
     namespaces -- list of ints of talk namespaces (default: [1])
     """
-    start_time = (
-        site.server_time().replace(hour=0, minute=0, second=0, microsecond=0) + period
-    )
+    server_day = site.server_time().replace(hour=0, minute=0, second=0, microsecond=0)
+    start_time = server_day + period
+    end_time = server_day
     try:
-        pages = list(_db_get_new_category_pages(category, start_time, namespaces))
+        pages = list(
+            _db_get_new_category_pages(category, start_time, end_time, namespaces)
+        )
     except ConnectionError:
-        pages = list(_api_get_new_category_pages(category, start_time, namespaces))
+        pages = list(
+            _api_get_new_category_pages(category, start_time, end_time, namespaces)
+        )
 
     return pages
 
@@ -71,6 +75,7 @@ def get_new_category_pages(
 def _api_get_new_category_pages(
     category: pywikibot.Category,
     start_time: pywikibot.Timestamp,
+    end_time: pywikibot.Timestamp,
     namespaces: List[int],
 ) -> Iterator[Tuple[pywikibot.page.BasePage, pywikibot.Timestamp]]:
     """Use API to list category pages. Called by get_new_categoryPages()"""
@@ -83,7 +88,7 @@ def _api_get_new_category_pages(
         cmtype="page",
         cmsort="timestamp",
         cmstart=start_time.isoformat(),
-        cmend="now",
+        cmend=end_time.isoformat(),
     ):
         if row.get("type", "page") != "page":
             continue
@@ -97,6 +102,7 @@ def _api_get_new_category_pages(
 def _db_get_new_category_pages(
     category: pywikibot.Category,
     start_time: pywikibot.Timestamp,
+    end_time: pywikibot.Timestamp,
     namespaces: List[int],
 ) -> Iterator[Tuple[pywikibot.page.BasePage, datetime]]:
     """Use DB to list category pages. Called by get_new_categoryPages()"""
@@ -111,13 +117,15 @@ def _db_get_new_category_pages(
         "WHERE "
         '    cl_to = "{catname}" AND '
         '    cl_type = "page" AND '
-        "    cl_timestamp >= {timestamp} AND "
+        "    cl_timestamp >= {start_timestamp} AND "
+        "    cl_timestamp < {end_timestamp} AND "
         "    page_namespace in ({nslist}) "
         "ORDER BY cl_timestamp "
     ).format(
         catname=category.title(underscore=True, with_ns=False),
-        timestamp=start_time.totimestampformat(),
-        nslist=", ".join(str(n) for n in namespaces)
+        start_timestamp=start_time.totimestampformat(),
+        end_timestamp=end_time.totimestampformat(),
+        nslist=", ".join(str(n) for n in namespaces),
     )
 
     for ns, title, ts in pywikibot.data.mysql.mysql_query(query, dbname=site.dbName()):
@@ -220,7 +228,7 @@ def api_wikitext(category):
 
     wikitext = ""
     for date, values in pages.items():
-        wikitext += (f"'''{date}'''\n")
+        wikitext += f"'''{date}'''\n"
         for article in values:
             wikitext += (
                 "* {{Article status"
