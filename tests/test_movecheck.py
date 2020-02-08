@@ -49,7 +49,7 @@ def site():
 
 def test_get_AFC_reviewers(site):
     reviewers = movecheck.get_AFC_reviewers(site)
-    assert len(reviewers) > 900
+    assert len(reviewers) > 300
     assert type(reviewers) is set
 
 
