@@ -304,6 +304,7 @@ def test_fuzz_seq():
     assert citeinspector.fuzz_seq(lista, listb) == 56
 
 
+@pytest.mark.skip()
 def test_get_citoid_data_isbn():
     s = requests.Session()
     ident = "9781786751041"
