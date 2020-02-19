@@ -20,12 +20,24 @@
 import toolforge
 import flask
 import pymysql.cursors
+import phpserialize
 
 bp = flask.Blueprint("filearchive", __name__, url_prefix="/filearchive")
+
+try:
+    f = open("/etc/wmcs-project")
+except FileNotFoundError:
+    wmcs = False
+else:
+    f.close()
+    wmcs = True
 
 
 def query_database(dbname="commonswiki", page=""):
     assert page
+    if not wmcs:
+        raise OSError
+    # TODO: select only needed rows instead of ignoring later
     query = """
 SELECT
   (
@@ -72,6 +84,36 @@ WHERE
         return cur.fetchall()
 
 
+def process_db_result(raw_data):
+    data = {}
+    # remove non-useful keys to other dbs
+    for key in {
+        "fa_id",
+        "fa_deleted_user",
+        "fa_deleted_reason_id",
+        "fa_description_id",
+        "fa_actor",
+    }:
+        raw_data.pop(key, None)
+
+    # handle metadata PHP array
+    data["fa_metadata"] = phpserialize.loads(
+        raw_data.pop("fa_metadata", ""), decode_strings=True
+    )
+
+    # stringify everything else
+    for key, value in raw_data.items():
+        if not value:
+            continue
+        elif isinstance(value, bytes):
+            # decode unicode strings
+            data[key] = str(value, encoding="utf-8")
+        else:
+            data[key] = str(value)
+
+    return data
+
+
 @bp.route("/")
 def form():
     dbname = flask.request.args.get("dbname")
@@ -92,6 +134,6 @@ def main(wiki, page):
     if ":" in "page":
         raise ValueError
 
-    data = query_database(wiki, page)
-    print(data)
+    raw_data = query_database(wiki, page)
+    data = [process_db_result(line) for line in raw_data]
     return str(data)
