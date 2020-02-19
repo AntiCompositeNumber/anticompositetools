@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+{% block title %}Filearchive{% endblock %}
+{% block head %}
+  {{ super() }}
+  <style type="text/css">
+    .important { color: #336699; }
+  </style>
+{% endblock %}
+{% block content %}
+  <h1>Filearchive</h1>
+  <div>
+    <p>
+      This tool displays information about deleted files, including the uploader and EXIF metadata. It does not usually have access to the description page or the file itself. 
+    </p>
+  </div>
+
+  <form action="{{url_for('filearchive.form')}}" method="get">
+    <div class="form-group">
+        <label for="dbname">Wiki</label>
+        <select class="form-control" id="dbname">
+        {% for option in sitematrix|sort() %}
+            <option{% if option == "commonswiki"%} selected{%endif%}>{{option}}</option>
+        {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="filename">Filename</label>
+        <input class="form-control" id="filename" placeholder="Example.jpg">
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+ </form>
+{% endblock %}
