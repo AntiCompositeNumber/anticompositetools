@@ -21,6 +21,7 @@ import toolforge
 import flask
 import pymysql.cursors
 import phpserialize
+from decimal import Decimal
 
 bp = flask.Blueprint("filearchive", __name__, url_prefix="/filearchive")
 
@@ -36,7 +37,83 @@ else:
 def query_database(dbname="commonswiki", page=""):
     assert page
     if not wmcs:
-        raise OSError
+        # test data
+        return [
+            {
+                "upload_user": b"AntiCompositeNumber",
+                "deleted_user": b"Arthur Crbz",
+                "fa_id": 5962279,
+                "fa_name": b"Blaze_Pizza's_Artisan_Pizza.jpg",
+                "fa_archive_name": None,
+                "fa_storage_group": b"deleted",
+                "fa_storage_key": None,
+                "fa_deleted_user": 3768717,
+                "fa_deleted_timestamp": b"20200129082735",
+                "fa_deleted_reason_id": 137788728,
+                "fa_size": 2827521,
+                "fa_width": 5184,
+                "fa_height": 3456,
+                "fa_metadata": (
+                    b"a:36:{"
+                    b's:4:"Make";s:5:"Canon";'
+                    b's:5:"Model";s:13:"Canon EOS 60D";'
+                    b's:11:"Orientation";i:1;'
+                    b's:11:"XResolution";s:4:"72/1";'
+                    b's:11:"YResolution";s:4:"72/1";'
+                    b's:14:"ResolutionUnit";i:2;'
+                    b's:8:"Software";s:12:"Photos 1.0.1";'
+                    b's:8:"DateTime";s:19:"2015:05:01 12:02:28";'
+                    b's:12:"ExposureTime";s:4:"1/80";'
+                    b's:7:"FNumber";s:3:"4/1";'
+                    b's:15:"ExposureProgram";i:2;'
+                    b's:15:"ISOSpeedRatings";i:1000;'
+                    b's:11:"ExifVersion";s:4:"0230";'
+                    b's:16:"DateTimeOriginal";s:19:"2015:05:01 12:02:28";'
+                    b's:17:"DateTimeDigitized";s:19:"2015:05:01 12:02:28";'
+                    b's:23:"ComponentsConfiguration";a:5:{'
+                    b'i:0;i:1;i:1;i:2;i:2;i:3;i:3;i:0;s:5:"_type";s:2:"ol";}'
+                    b's:17:"ShutterSpeedValue";s:4:"51/8";'
+                    b's:13:"ApertureValue";s:3:"4/1";'
+                    b's:17:"ExposureBiasValue";s:3:"0/1";'
+                    b's:16:"MaxApertureValue";s:3:"4/1";'
+                    b's:12:"MeteringMode";i:5;'
+                    b's:5:"Flash";i:16;'
+                    b's:11:"FocalLength";s:4:"58/1";'
+                    b's:10:"SubSecTime";s:2:"00";'
+                    b's:18:"SubSecTimeOriginal";s:2:"00";'
+                    b's:19:"SubSecTimeDigitized";s:2:"00";'
+                    b's:15:"FlashPixVersion";s:4:"0100";'
+                    b's:10:"ColorSpace";i:1;'
+                    b's:21:"FocalPlaneXResolution";s:8:"97379/17";'
+                    b's:21:"FocalPlaneYResolution";s:9:"331079/57";'
+                    b's:24:"FocalPlaneResolutionUnit";i:2;'
+                    b's:14:"CustomRendered";i:0;'
+                    b's:12:"ExposureMode";i:0;'
+                    b's:12:"WhiteBalance";i:0;'
+                    b's:16:"SceneCaptureType";i:0;'
+                    b's:22:"MEDIAWIKI_EXIF_VERSION";i:2;}'
+                ),
+                "fa_bits": 8,
+                "fa_media_type": b"BITMAP",
+                "fa_major_mime": b"image",
+                "fa_minor_mime": b"jpeg",
+                "fa_description_id": Decimal("76801283"),
+                "fa_actor": 3465,
+                "fa_timestamp": b"20170630153739",
+                "fa_deleted": 0,
+                "fa_sha1": b"cfn5g1q6ptjpdcbk2eptx2l686hsw35",
+                "upload_comment": (
+                    b"Transferred from "
+                    b"[[w:File:Blaze Pizza's Artisan Pizza.jpg|en.wikipedia]] "
+                    b"([[w:Wikipedia:MTC!|MTC!]]) (1.0.0)"
+                ),
+                "deleted_comment": (
+                    b"Media missing permission as of 21 January 2020. "
+                    b"Please send a [[COM:Consent|permission statement]] "
+                    b"to undelete this file."
+                ),
+            }
+        ]
     # TODO: select only needed rows instead of ignoring later
     query = """
 SELECT
