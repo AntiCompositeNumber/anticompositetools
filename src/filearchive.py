@@ -74,7 +74,14 @@ WHERE
 
 @bp.route("/")
 def form():
-    pass
+    dbname = flask.request.args.get("dbname")
+    page = flask.request.args.get("filename")
+    if dbname and page:
+        return flask.redirect(flask.url_for("filearchive.main", wiki=dbname, page=page))
+    else:
+        return flask.render_template(
+            "filearchive-form.html", sitematrix=["enwiki", "arwiki", "commonswiki"]
+        )
 
 
 @bp.route("/<wiki>/<page>")
