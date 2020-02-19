@@ -31,6 +31,8 @@ PyMySQL = "*"
 Werkzeug = "*"
 python-Levenshtein = "*"
 requests-oauthlib = "*"
+phpserialize = "*"
+toolforge = "*"
 
 [requires]
 python_version = "3.7"

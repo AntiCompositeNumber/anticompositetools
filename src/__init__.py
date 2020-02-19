@@ -52,7 +52,15 @@ def create_app(test_config=None):
     )
     app.config["version"] = rev.stdout
 
-    from . import hyphenator, citeinspector, deploy, movecheck, paracheck, projectnew
+    from . import (
+        hyphenator,
+        citeinspector,
+        deploy,
+        movecheck,
+        paracheck,
+        projectnew,
+        filearchive,
+    )
 
     app.register_blueprint(hyphenator.bp)
     app.register_blueprint(citeinspector.bp)
@@ -60,6 +68,7 @@ def create_app(test_config=None):
     app.register_blueprint(movecheck.bp)
     app.register_blueprint(paracheck.bp)
     app.register_blueprint(projectnew.bp)
+    app.register_blueprint(filearchive.bp)
 
     @app.route("/")
     def index():
