@@ -17,7 +17,7 @@
   <form action="{{url_for('filearchive.form')}}" method="get">
     <div class="form-group">
         <label for="dbname">Wiki</label>
-        <select class="form-control" id="dbname">
+        <select class="form-control" id="dbname" name="dbname">
         {% for option in sitematrix|sort() %}
             <option{% if option == "commonswiki"%} selected{%endif%}>{{option}}</option>
         {% endfor %}
@@ -25,7 +25,7 @@
     </div>
     <div class="form-group">
         <label for="filename">Filename</label>
-        <input class="form-control" id="filename" placeholder="Example.jpg">
+        <input class="form-control" id="filename" placeholder="Example.jpg" name="filename">
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>
  </form>
