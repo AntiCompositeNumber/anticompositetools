@@ -210,12 +210,11 @@ def form():
 
 @bp.route("/<wiki>/<page>")
 def main(wiki, page):
-    if page.startswith("File:"):
-        page = page.rpartition("File:")[2]
+    page = page.strip().rpartition(":")[2].replace(" ", "_")
 
     if ":" in "page":
         raise ValueError
 
-    raw_data = query_database(wiki, page)
+    raw_data = query_database(wiki.strip(), page)
     data = [process_db_result(line) for line in raw_data]
     return flask.render_template("filearchive-output.html", data=data, labels={})
