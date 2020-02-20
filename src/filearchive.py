@@ -177,7 +177,12 @@ def process_db_result(raw_data):
     data["fa_metadata"] = phpserialize.loads(
         raw_data.pop("fa_metadata", ""), decode_strings=True
     )
-
+    components = data["fa_metadata"].get("ComponentsConfiguration", {})
+    if components:
+        components.pop("_type", "")
+        data["fa_metadata"]["ComponentsConfiguration"] = phpserialize.dict_to_list(
+            components
+        )
     # stringify everything else
     for key, value in raw_data.items():
         if not value:
@@ -213,4 +218,4 @@ def main(wiki, page):
 
     raw_data = query_database(wiki, page)
     data = [process_db_result(line) for line in raw_data]
-    return str(data)
+    return flask.render_template("filearchive-output.html", data=data, labels={})
