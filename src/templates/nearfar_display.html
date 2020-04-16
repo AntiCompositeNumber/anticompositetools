@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block title %}Nearfar{% endblock %}
+{% block head %}
+  {{ super() }}
+  <style type="text/css">
+    .important { color: #336699; }
+  </style>
+{% endblock %}
+{% block content %}
+  <h1>Nearfar</h1>
+  <p><span class="h4">{{lat}}, {{lon}}</span> <a class="text-small ml-3" href="https://tools.wmflabs.org/geohack/geohack.php?params={{lat}};{{lon}}">GeoHack</a></p>
+  <ul class="list-group list-group-flush">
+  {% for d in data %}
+    <li class="list-group-item">
+      <div class="media">
+        <img src="{{d.get("thumbnail", {}).get("source", "")}}" class="mr-3" alt="{{d.get("pageimage", "")}}" style="max-width:75px">
+        <div class="media-body">
+          <a href="{{d.get("fullurl", "")}}" class="stretched-link text-reset"><h5 class="mt-0 mb-1">{{d.get("title", "")}}</h5></a>
+          <p class="mt-0 mb-1">{{d.get("description", "")}}</p>
+          <p class="mt-0 mb-1 text-muted">{{d.get("dist", "")}} km</p>
+        </div>
+      </div>
+    </li>
+  {% endfor %}
+  </ul>
+{% endblock %}

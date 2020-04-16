@@ -60,6 +60,7 @@ def create_app(test_config=None):
         paracheck,
         projectnew,
         filearchive,
+        nearfar,
     )
 
     app.register_blueprint(hyphenator.bp)
@@ -69,6 +70,7 @@ def create_app(test_config=None):
     app.register_blueprint(paracheck.bp)
     app.register_blueprint(projectnew.bp)
     app.register_blueprint(filearchive.bp)
+    app.register_blueprint(nearfar.bp)
 
     @app.route("/")
     def index():
