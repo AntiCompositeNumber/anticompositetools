@@ -9,7 +9,7 @@
 {% block content %}
   <h1>Nearfar</h1>
   <p><span class="h4">{{lat}}, {{lon}}</span> <a class="text-small ml-3" href="https://tools.wmflabs.org/geohack/geohack.php?params={{lat}};{{lon}}">GeoHack</a></p>
-  <ul class="list-group list-group-flush">
+  <ol class="list-group list-group-flush">
   {% for d in data %}
     <li class="list-group-item">
       <div class="media">
@@ -17,7 +17,7 @@
         <div class="media-body">
           <a href="{{d.get("fullurl", "")}}" class="stretched-link text-reset"><h5 class="mt-0 mb-1">{{d.get("title", "")}}</h5></a>
           <p class="mt-0 mb-1">{{d.get("description", "")}}</p>
-          <p class="mt-0 mb-1 text-muted">{{d.get("dist", "")}} km</p>
+          <p class="mt-0 mb-1 text-muted">{{d.get("dist", "")}} m</p>
         </div>
       </div>
     </li>
