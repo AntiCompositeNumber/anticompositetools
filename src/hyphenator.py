@@ -34,7 +34,7 @@ def get_wikitext(url):
 
     headers = {
         "user-agent": "anticompositetools/hyphenator "
-        "(https://tools.wmflabs.org/anticompositetools/hyphenator; "
+        "(https://anticompositetools.toolforge.org/hyphenator; "
         "tools.anticompositetools@tools.wmflabs.org) python-requests/"
         + requests.__version__
     }

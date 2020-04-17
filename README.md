@@ -8,7 +8,7 @@
 A group of tools built for the English Wikipedia and other Wikimedia projects, written in Python using Flask and running on Wikimedia Toolforge.
 
 ## Hyphenator
-https://tools.wmflabs.org/anticompositetools/hyphenator
+https://anticompositetools.toolforge.org/hyphenator
 Normlises the format of ISBNs using [python-stdnum](https://arthurdejong.org/python-stdnum/).
 
 Uses:
@@ -17,7 +17,7 @@ Uses:
 * [stdnum](https://github.com/arthurdejong/python-stdnum)
 
 ## CiteInspector
-https://tools.wmflabs.org/anticompositetools/citeinspector
+https://anticompositetools.toolforge.org/citeinspector
 Compares existing citations in an article to data from Citoid.
 
 Uses:
