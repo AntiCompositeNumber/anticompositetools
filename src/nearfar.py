@@ -20,6 +20,8 @@
 import flask
 import requests
 import itertools
+from werkzeug.datastructures import MultiDict
+
 # import re
 
 bp = flask.Blueprint("nearfar", __name__, url_prefix="/nearfar")
@@ -27,7 +29,7 @@ session = requests.Session()
 session.headers.update(
     {
         "User-Agent": "anticompositetools/nearfar "
-        "(https://tools.wmflabs.org/anticompositetools/nearfar; "
+        "(https://anticompositetools.toolforge.org/nearfar; "
         "tools.anticompositetools@tools.wmflabs.org) python-requests/"
         + requests.__version__
     }
@@ -36,21 +38,29 @@ session.headers.update(
 
 @bp.route("/")
 def form():
-    args = flask.request.args
-    coord = args.get("site"), args.get("lat"), args.get("lon")
+    args = MultiDict(flask.request.args)
+    coord = args.pop("site", None), args.pop("lat", None), args.pop("lon", None)
     if all(coord):
         return flask.redirect(
-            flask.url_for(".display", site=coord[0], lat=coord[1], lon=coord[2])
+            flask.url_for(
+                "nearfar.display", site=coord[0], lat=coord[1], lon=coord[2], **args
+            )
         )
+
     return flask.render_template("nearfar_form.html")
 
 
 @bp.route("/<site>/<lat>/<lon>")
 def display(site, lat, lon):
+    args = flask.request.args
     url = f"https://{site}/w/api.php"
     pipe_coord = f"{lat}|{lon}"
-    limit = 50
-    radius = 10000
+    limit = int(args.get("limit", 50))
+    radius = int(args.get("radius", 10000))
+    if radius > 10000 or radius == "max":
+        radius = 10000
+    if limit > 500 or limit == "max":
+        limit = 500
     params = {
         "action": "query",
         "format": "json",
