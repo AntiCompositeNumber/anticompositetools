@@ -24,6 +24,8 @@ import re
 import logging
 import json
 import itertools
+import pywikibot
+from pywikibot.data.api import Request
 import mwparserfromhell as mwph
 from typing import Set, NamedTuple, Iterator, Dict, Union, List, cast, Sequence
 
@@ -31,6 +33,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 bp = flask.Blueprint("dsalerts", __name__, url_prefix="/dsalerts")
+site = pywikibot.Site('en', 'wikipedia')
 session = requests.Session()
 session.headers.update(
     {
@@ -54,7 +57,7 @@ class DsAlert(NamedTuple):
 def get_ds_alert_hits(
     start_date: datetime.datetime, end_date: datetime.datetime
 ) -> Iterator[DsAlert]:
-    url = "https://en.wikipedia.org/w/api.php"
+    # url = "https://en.wikipedia.org/w/api.php"
     params = {
         "action": "query",
         "list": "abuselog",
@@ -66,11 +69,16 @@ def get_ds_alert_hits(
         "aflfilter": 602,
         "afllimit": "max",
         "aflprop": "user|title|result|timestamp|details|revid",
+        "continue": "",
     }
-    for i in range(10):
-        res = session.get(url, params=params)
-        res.raise_for_status()
-        raw_data = res.json()
+    for i in range(100):
+        logger.debug(i)
+        # res = session.get(url, params=params)
+        # res.raise_for_status()
+        # raw_data = res.json()
+        req = Request(site=site, parameters=params, use_get=True)
+        raw_data = req.submit()
+        # breakpoint()
         for hit in raw_data["query"]["abuselog"]:
             if hit["result"] == "tag":
                 for alert in parse_alert_data(hit):
@@ -83,7 +91,7 @@ def get_ds_alert_hits(
             break
     else:
         # flask.abort(400)
-        pass
+        logger.warning("Too many API queries!")
 
 
 class DsTopics:
@@ -133,7 +141,7 @@ class DsTopics:
                     if not sep or code == "#default":
                         continue
                     else:
-                        topics.setdefault(code, {})[key] = val
+                        topics.setdefault(code.lower(), {})[key] = val
                 elif "{{SAFESUBST" in line:
                     regex = r"lc:\{{3}(.*?)\|\}{5}"
                     match = re.search(regex, line)
@@ -166,7 +174,7 @@ class DsTopics:
 
 
 def normalize_topic(topic: str) -> str:
-    return DsTopics.aliases().get(topic, topic)
+    return DsTopics.aliases().get(topic.lower(), "")
 
 
 def parse_alert_data(hit: dict) -> List[DsAlert]:
