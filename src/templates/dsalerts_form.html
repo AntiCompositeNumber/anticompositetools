@@ -1,0 +1,65 @@
+{% extends "layout.html" %}
+{% block title %}DS Alerts{% endblock %}
+{% block content %}
+  <h1>DS Alerts</h1>
+  <div>
+    <p>
+      Analysis of enwiki DS alerts
+    </p>
+  </div>
+
+  <form action="{{url_for('dsalerts.show_data')}}" method="get">
+    <div class="row">
+      <div class="form-group col">
+        <label for="start_date">Start date:</label>
+        <input class="form-control" type="date" id="start_date" name="start_date" value={{default_start}} max={{now}} min="2001-01-01" required>
+      </div>
+      <div class="form-group col">
+        <label for="end_date">End date:</label>
+        <input class="form-control" type="date" id="end_date" name="end_date" value={{now}} max={{now}} min="2001-01-01" required>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="resolution">Resolution:</label>
+      <select class="form-control" id="resolution" name="resolution" required>
+        <option value="second">Second</option>
+        <option value="day" selected>Day</option>
+        <option value="month">Month</option>
+        <option value="year">Year</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="alerted_user">Alerted user(s):</label>
+      <input type="text" id="alerted_user" name="alerted_user" aria-describedby="alerted_user-help">
+      <small id="alerted_user-help" class="form-text text-muted">Seperate the usernames of multiple editors with "|"</small>
+    </div>
+    <div class="form-group">
+      <label for="sending_user">Sending user(s):</label>
+      <input type="text" id="sending_user" name="sending_user" aria-describedby="sending_user-help">
+      <small id="sending_user-help" class="form-text text-muted">Seperate the usernames of multiple editors with "|"</small>
+    </div>
+    <div class="form-group">
+      <h5>Case</h5>
+      {% for case, cdata in cases|dictsort%}
+      <div class="form-check form-check-inline">
+        <input class="form-check-input case" type="checkbox" id="checkbox-{{cdata['codes'][0]}}" value="{{cdata['codes'][0]}}" name="topic">
+        <label class="form-check-label" for="checkbox-{{cdata['codes'][0]}}">{{case}}</label>
+      </div>
+      {% endfor %}
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="checkbox-all" value="all" name="topic" checked>
+        <label class="form-check-label" for="checkbox-all">All</label>
+      </div>
+          </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+ </form>
+{% endblock %}
+{% block js %}
+<script>
+$(document).ready(function(){
+  $('#checkbox-all').change(function() {
+    $('.case').prop('checked', false{#$(this).prop("checked")#});
+  });
+});
+</script>
+{% endblock %}

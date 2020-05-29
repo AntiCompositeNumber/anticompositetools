@@ -25,7 +25,11 @@ import subprocess
 
 import flask
 
-logging.basicConfig(filename="act.log", level=logging.DEBUG)
+logging.basicConfig(
+    filename="act.log",
+    level=logging.DEBUG,
+    format="%(asctime)s %(levelname)s:%(name)s:%(message)s",
+)
 
 
 def create_app(test_config=None):
@@ -61,6 +65,7 @@ def create_app(test_config=None):
         projectnew,
         filearchive,
         nearfar,
+        dsalerts,
     )
 
     app.register_blueprint(hyphenator.bp)
@@ -71,6 +76,7 @@ def create_app(test_config=None):
     app.register_blueprint(projectnew.bp)
     app.register_blueprint(filearchive.bp)
     app.register_blueprint(nearfar.bp)
+    app.register_blueprint(dsalerts.bp)
 
     @app.route("/")
     def index():
