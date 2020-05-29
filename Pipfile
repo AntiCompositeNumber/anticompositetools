@@ -33,7 +33,6 @@ python-Levenshtein = "*"
 requests-oauthlib = "*"
 phpserialize = "*"
 toolforge = "*"
-seaborn = "*"
 
 [requires]
 python_version = "3.7"

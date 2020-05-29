@@ -28,7 +28,6 @@ python-stdnum
 pywikibot
 requests
 requests-oauthlib
-seaborn
 toolforge
 urllib3
 werkzeug

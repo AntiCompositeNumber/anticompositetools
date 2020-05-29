@@ -23,7 +23,6 @@ import requests
 import re
 import logging
 import json
-import seaborn
 import itertools
 import mwparserfromhell as mwph
 from typing import Set, NamedTuple, Iterator, Dict, Union, List, cast, Sequence
@@ -295,10 +294,25 @@ def api_data():
 
 
 def colors():
-    palette = seaborn.color_palette("muted", len(DsTopics.cases()))
-    for color in palette:
-        color = tuple(v * 255 for v in color)
-        yield f"rgb{str(color)}"
+    # palette = seaborn.color_palette("muted", count)
+    # for color in palette:
+    #     color = tuple(v * 255 for v in color)
+    #     yield f"rgb{str(color)}"
+    palette = [
+        "rgb(72.0, 120.0, 208.0)",
+        "rgb(238.0, 133.0, 74.0)",
+        "rgb(106.0, 204.0, 100.0)",
+        "rgb(214.0, 95.0, 95.0)",
+        "rgb(149.0, 108.0, 180.0)",
+        "rgb(140.0, 97.0, 60.0)",
+        "rgb(220.0, 126.0, 192.0)",
+        "rgb(121.0, 121.0, 121.0)",
+        "rgb(213.0, 187.0, 103.0)",
+        "rgb(130.0, 198.0, 226.0)",
+    ]
+    while True:
+        for color in palette:
+            yield color
 
 
 @bp.route("/data")
