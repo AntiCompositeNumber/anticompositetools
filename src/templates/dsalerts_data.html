@@ -1,0 +1,65 @@
+{% extends "layout.html" %}
+{% block title %}DS Alerts{% endblock %}
+{% block head %}
+  {{ super() }}
+{% endblock %}
+{% block content %}
+  <h1>DS Alerts</h1>
+
+  <div>
+    <canvas id="alertchart" width="400" height="400"></canvas>
+  </div>
+  <div>
+    <table class="table table-striped">
+      <tr>
+        <th>Date</th>
+        <th>Alerts</th>
+      </tr>
+      {% for date, value in d.items()%}
+      <tr>
+        <th rel="row">{{date}}</th> 
+        <td>
+          <table class="table table-striped table-sm table-bordered">
+            {% for topic, count in value.items() %}
+            <tr>
+              {% if topic == "Total" %}
+              <td><b>{{topic}}</b></td>
+              {% else %}
+              <td>{{topics.get(topic, {}).get("case", topic)}}</td>
+              {% endif %}
+              <td>{{count}}</td>
+            </tr>
+            {% endfor %}
+          </table>
+
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+{% endblock %}
+{% block js %}
+<script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js" crossorigin="anonymous"></script>
+<script>
+  var ctx = $('#alertchart');
+  var alertchart = new Chart(ctx, {
+    type: 'bar',
+    data: {"datasets": {{chart|safe}}},
+    options: {
+      scales: {
+        xAxes: [
+          {
+            type: 'time', 
+            stacked: true,
+            offset: true,
+          }
+        ],
+        yAxes: [
+          {
+            stacked: true
+          }
+        ],
+      }
+    }
+  });
+</script>
+{% endblock %}

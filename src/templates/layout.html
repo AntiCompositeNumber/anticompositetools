@@ -32,6 +32,7 @@
           {{ nav_row('index', 'Home') }} 
           {{ nav_row('hyphenator.form', 'Hyphenator') }}
           {{ nav_row('citeinspector.form', 'CiteInspector') }}
+          {{ nav_row('dsalerts.form', 'DS Alerts') }}
           {{ nav_row('filearchive.form', 'Filearchive') }}
           {{ nav_row('nearfar.form', 'Nearfar') }}
           {{ nav_row('movecheck.movecheck', 'Movecheck') }}
@@ -75,5 +76,7 @@
     <script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/jquery/3.3.1/jquery.slim.min.js" crossorigin="anonymous"></script>
     <script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/popper.js/1.14.7/esm/popper.min.js" crossorigin="anonymous"></script>
     <script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js" crossorigin="anonymous"></script>
+    {% block js %}
+    {% endblock %}
   </body>
 </html>

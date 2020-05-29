@@ -28,6 +28,7 @@
     {% endmacro %}
       {{ frontcard('Hyphenator', 'Automatically hyphenates ISBNs and converts 10-digit ISBNs to 13-digit ISBNs.', url_for('hyphenator.form')) }}
       {{ frontcard('CiteInspector', 'Compares existing citations to Citoid data.', url_for('citeinspector.form'), beta=True) }}
+      {{ frontcard('DS Alerts', 'Statistics on discretionary sanction alerts.', url_for('dsalerts.form')) }}
       {{ frontcard('Filearchive', 'Extracts metadata about deleted files.', url_for('filearchive.form')) }}
       {{ frontcard("Nearfar", "Like Special:Nearby, only anywhere.", url_for("nearfar.form")) }}
       {{ frontcard('MoveCheck', 'Recent moves to mainspace that may need review', url_for('movecheck.movecheck'), beta=True) }}
