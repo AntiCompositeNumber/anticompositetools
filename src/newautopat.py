@@ -68,4 +68,6 @@ def results():
     limit = int(flask.request.args.get("limit", 100))
     hideredirs = bool(flask.request.args.get("hideredirs", False))
     data = run_query(limit=limit, hideredirs=hideredirs)
-    return flask.render_template("newautopat_results.html", data=data)
+    return flask.render_template(
+        "newautopat_results.html", data=data, limit=limit, hideredirs=hideredirs
+    )

@@ -15,16 +15,16 @@
         <label for="inputLimit" class="col-sm col-form-label">Changes to display:</label>
         <div class="col-sm float-right">
           <select class="form-control" id="inputLimit" name="limit">
-            <option>20</option>
-            <option>50</option>
-            <option selected>100</option>
-            <option>250</option>
-            <option>500</option>
+            <option {%if limit==20%}selected{%endif%}>20</option>
+            <option {%if limit==50%}selected{%endif%}>50</option>
+            <option {%if limit==100%}selected{%endif%}>100</option>
+            <option {%if limit==250%}selected{%endif%}>250</option>
+            <option {%if limit==500%}selected{%endif%}>500</option>
           </select>
         </div>
       </div>
       <div class="form-group form-check">
-        <input type="checkbox" class="form-check-input" id="inputRedirects" name="hideredirs" value="true">
+          <input type="checkbox" class="form-check-input" id="inputRedirects" name="hideredirs" value="true" {%if hideredirs%}checked{%endif%}>
         <label for="inputRedirects" class="form-check-label">Hide redirects</label>
       </div>
       <button type="submit" class="btn btn-primary">Submit</button>
