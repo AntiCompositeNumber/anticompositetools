@@ -66,6 +66,7 @@ def create_app(test_config=None):
         filearchive,
         nearfar,
         dsalerts,
+        newautopat,
     )
 
     app.register_blueprint(hyphenator.bp)
@@ -77,6 +78,7 @@ def create_app(test_config=None):
     app.register_blueprint(filearchive.bp)
     app.register_blueprint(nearfar.bp)
     app.register_blueprint(dsalerts.bp)
+    app.register_blueprint(newautopat.bp)
 
     @app.route("/")
     def index():

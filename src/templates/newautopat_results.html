@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+{% block title %}New autopatrolled{% endblock %}
+{% block head %}
+  {{ super() }}
+  <style type="text/css">
+    .important { color: #336699; }
+  </style>
+{% endblock %}
+{% block content %}
+  <h1>New autopatrolled <span class="badge badge-info">Beta</span></h1>
+  <div class="border shadow-sm container py-3 mb-3">
+    <p>This tool lists recent article creations by autopatrolled users</p>
+    <form action="{{url_for('newautopat.results')}}" method="get">
+      <div class="form-group row">
+        <label for="inputLimit" class="col-sm col-form-label">Changes to display:</label>
+        <div class="col-sm float-right">
+          <select class="form-control" id="inputLimit" name="limit">
+            <option>20</option>
+            <option>50</option>
+            <option selected>100</option>
+            <option>250</option>
+            <option>500</option>
+          </select>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+  </div>
+  <div>
+    <ul>
+    {% for d in data %}
+      <li class="mb-2 logitem">{{d['timestamp']}} <a href="{{d['user_url']}}">{{d['user'].replace("_", " ")}}</a> (<a href="{{d['user_talk_url']}}">talk</a> | <a href="{{d['user_contribs_url']}}">contribs</a>) created page <a href="{{d['url']}}">{{d['title'].replace("_", " ")}}</a> {% if d['comment'] %}({{d['comment']}}){% endif %} {{d['tags']}}</li>
+    {% endfor %}
+    </ul>
+{% endblock %}
