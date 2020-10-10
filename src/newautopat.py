@@ -25,9 +25,9 @@ bp = flask.Blueprint("newautopat", __name__, url_prefix="/newautopat")
 base_url = "https://en.wikipedia.org/wiki"
 
 
-def run_query(limit=100, redirects=True) -> Iterator[Dict[str, str]]:
+def run_query(limit=100, hideredirs=False) -> Iterator[Dict[str, str]]:
     where = ""
-    if not redirects:
+    if hideredirs:
         where += "AND page_is_redirect = 0"
     query = f"""
 SELECT rc_timestamp, rc_title, actor_name, comment_text
@@ -65,6 +65,6 @@ LIMIT {limit}
 @bp.route("/")
 def results():
     limit = int(flask.request.args.get("limit", 100))
-    redirects = bool(flask.request.args.get("redirects", True))
-    data = run_query(limit=limit, redirects=redirects)
+    hideredirs = bool(flask.request.args.get("hideredirs", False))
+    data = run_query(limit=limit, hideredirs=hideredirs)
     return flask.render_template("newautopat_results.html", data=data)
