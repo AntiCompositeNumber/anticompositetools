@@ -55,6 +55,7 @@ LIMIT %s
         line["user_talk_url"] = f"{base_url}/User_talk:{line['user']}"
         line["user_contribs_url"] = f"{base_url}/Special:Contribs/{line['user']}"
         line["url"] = f"{base_url}/{line['title']}"
+        yield line
 
 
 @bp.route("/")
