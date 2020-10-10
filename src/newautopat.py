@@ -19,13 +19,13 @@
 
 import toolforge
 import flask
-from typing import Iterator, Tuple
+from typing import Iterator, Dict
 
 bp = flask.Blueprint("newautopat", __name__, url_prefix="/newautopat")
 base_url = "https://en.wikipedia.org/wiki"
 
 
-def run_query(limit=100) -> Iterator[Tuple[int, str, str]]:
+def run_query(limit=100) -> Iterator[Dict[str, str]]:
     query = """
 SELECT rc_timestamp, rc_title, actor_name, comment_text
 FROM recentchanges
@@ -46,7 +46,7 @@ LIMIT %s
 
     for row in data:
         line = {
-            "timestamp": row[0],
+            "timestamp": str(row[0], encoding="utf-8"),
             "title": str(row[1], encoding="utf-8"),
             "user": str(row[2], encoding="utf-8").replace(" ", "_"),
             "comment": str(row[3], encoding="utf-8"),
