@@ -25,8 +25,11 @@ bp = flask.Blueprint("newautopat", __name__, url_prefix="/newautopat")
 base_url = "https://en.wikipedia.org/wiki"
 
 
-def run_query(limit=100) -> Iterator[Dict[str, str]]:
-    query = """
+def run_query(limit=100, redirects=True) -> Iterator[Dict[str, str]]:
+    where = ""
+    if not redirects:
+        where += "AND page_is_redirect = 0"
+    query = f"""
 SELECT rc_timestamp, rc_title, actor_name, comment_text
 FROM recentchanges
 JOIN actor_revision ON rc_actor = actor_id
@@ -36,12 +39,13 @@ WHERE
     rc_namespace = 0
     AND ug_group = "autoreviewer"
     AND rc_new = 1
+    {where}
 ORDER BY rc_timestamp DESC
-LIMIT %s
+LIMIT {limit}
 """
     conn = toolforge.connect("enwiki_p")
     with conn.cursor() as cur:
-        cur.execute(query, args=(limit))
+        cur.execute(query)
         data = cur.fetchall()
 
     for row in data:
@@ -60,6 +64,7 @@ LIMIT %s
 
 @bp.route("/")
 def results():
-    limit = flask.request.args.get("limit", 100)
-    data = run_query(limit)
+    limit = int(flask.request.args.get("limit", 100))
+    redirects = bool(flask.request.args.get("redirects", True))
+    data = run_query(limit=limit, redirects=redirects)
     return flask.render_template("newautopat_results.html", data=data)
