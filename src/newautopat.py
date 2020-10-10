@@ -62,4 +62,4 @@ LIMIT %s
 def results():
     limit = flask.request.args.get("limit", 100)
     data = run_query(limit)
-    return flask.render_template("newautopat_results.html", d=data)
+    return flask.render_template("newautopat_results.html", data=data)
