@@ -35,6 +35,7 @@ FROM recentchanges
 JOIN actor_revision ON rc_actor = actor_id
 JOIN user_groups ON actor_user = ug_user
 JOIN comment_recentchanges ON rc_comment_id = comment_id
+JOIN page ON rc_cur_id = page_id
 WHERE
     rc_namespace = 0
     AND ug_group = "autoreviewer"
