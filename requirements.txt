@@ -10,35 +10,35 @@
 # `Pipfile.lock` and then regenerate `requirements*.txt`.
 ################################################################################
 
-attrs==20.3.0
+attrs==20.3.0 ; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
 certifi==2020.12.5
 chardet==4.0.0
-click==8.0.0a1
+click==7.1.2
 flask==1.1.2
 fuzzywuzzy==0.18.0
 idna==2.10
-importlib-metadata==3.3.0 ; python_version < '3.8'
+importlib-metadata==3.4.0 ; python_version < '3.8'
 iniconfig==1.1.1
-itsdangerous==2.0.0a1
-jinja2==3.0.0a1
-markupsafe==2.0.0a1
+itsdangerous==1.1.0
+jinja2==2.11.2
+markupsafe==1.1.1
 mwparserfromhell==0.6
-oauthlib==3.1.0
-packaging==20.8
+oauthlib==3.1.0 ; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
+packaging==20.8 ; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
 phpserialize==1.3
-pluggy==1.0.0.dev0
-py==1.10.0
-pymysql==0.10.1
-pyparsing==3.0.0b1
+pluggy==0.13.1 ; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
+py==1.10.0 ; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
+pymysql==1.0.2
+pyparsing==2.4.7 ; python_version >= '2.6' and python_version not in '3.0, 3.1, 3.2, 3.3'
 pytest==6.2.1
 python-levenshtein==0.12.0
-python-stdnum==1.14
+python-stdnum==1.15
 pywikibot
 requests-oauthlib==1.3.0
 requests==2.25.1
-toml==0.10.2
-toolforge==4.3.2
+toml==0.10.2 ; python_version >= '2.6' and python_version not in '3.0, 3.1, 3.2, 3.3'
+toolforge==4.4.0
 typing-extensions==3.7.4.3 ; python_version < '3.8'
 urllib3==1.26.2
 werkzeug==1.0.1
-zipp==3.4.0
+zipp==3.4.0 ; python_version >= '3.6'
