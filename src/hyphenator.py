@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-# Copyright 2019 AntiCompositeNumber
+# Copyright 2021 AntiCompositeNumber
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -110,7 +110,7 @@ def get_page_url(url):
     return new_url
 
 
-def main(raw_url):
+def main(raw_url, convert=True):
     url = get_page_url(raw_url)
     wikitext, times = get_wikitext(url)
 
@@ -120,7 +120,7 @@ def main(raw_url):
         if not check_isbn(raw_isbn):
             continue
 
-        new_isbn = isbn.format(raw_isbn, convert=True)
+        new_isbn = isbn.format(raw_isbn, convert=convert)
         if raw_isbn != new_isbn:
             count += 1
             template.add(para, new_isbn)
@@ -143,8 +143,9 @@ def output():
 
     if flask.request.method == "POST":
         pageurl = flask.request.form["page_url"]
+        convert = bool(flask.request.form.get("convert", False))
         try:
-            newtext, times, count, url = main(pageurl)
+            newtext, times, count, url = main(pageurl, convert)
         except Exception as err:
             if not check_err(flash):
                 flash.append(
