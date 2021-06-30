@@ -21,6 +21,7 @@ import toolforge
 import flask
 import pymysql.cursors
 import phpserialize
+import json
 from decimal import Decimal
 
 bp = flask.Blueprint("filearchive", __name__, url_prefix="/filearchive")
@@ -173,16 +174,18 @@ def process_db_result(raw_data):
     }:
         raw_data.pop(key, None)
 
-    # handle metadata PHP array
-    data["fa_metadata"] = phpserialize.loads(
-        raw_data.pop("fa_metadata", ""), decode_strings=True
-    )
-    components = data["fa_metadata"].get("ComponentsConfiguration", {})
-    if components:
-        components.pop("_type", "")
-        data["fa_metadata"]["ComponentsConfiguration"] = phpserialize.dict_to_list(
-            components
-        )
+    # Metadata can be stored as JSON or as a serialized PHP array. 
+    metadata = raw_data.pop("fa_metadata", "")
+    try:
+        data["fa_metadata"] = json.loads(metadata)
+    except json.JSONDecodeError:
+        data["fa_metadata"] = phpserialize.loads(metadata, decode_strings=True)
+        components = data["fa_metadata"].get("ComponentsConfiguration", {})
+        if components:
+            components.pop("_type", "")
+            data["fa_metadata"]["ComponentsConfiguration"] = phpserialize.dict_to_list(
+                components
+            )
     # stringify everything else
     for key, value in raw_data.items():
         if not value:
