@@ -101,7 +101,8 @@ def get_page_url(url):
             flash.append(("Invalid URL", "danger"))
             raise ValueError  # fix
     elif "/wiki/" in parsed.path:
-        title = parsed.path[6:]
+        # Because some people expect invalid URLs to work anyway
+        title = urllib.parse.quote(urllib.parse.unquote(parsed.path[6:]))
     else:
         flash.append(("Invalid URL", "danger"))
         raise ValueError  # this one too
