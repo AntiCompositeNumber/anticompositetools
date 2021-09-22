@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "ad346f1af778ceffbc85b86b3b0da93a3ea635aaa302f78b5ed776ceb93c1d33"
+            "sha256": "961e445a3e39bbebbde4a87e8d1130991b3a9fa7fe59ff3b82a0e712a2323007"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -252,7 +252,7 @@
                 "sha256:14e99e14e11a14cadf4d99effd4c5c30a9f46b116551ee69b4e5f8f6004f62d5",
                 "sha256:61b247121581f50c7988eece6ebb2d87ccc3be46c5552daf910d56e20cf6da75"
             ],
-            "markers": "python_version >= '3.5'",
+            "markers": "python_full_version >= '3.5.0'",
             "version": "==3.0.0rc1"
         },
         "pytest": {
@@ -279,8 +279,11 @@
             "version": "==1.16"
         },
         "pywikibot": {
-            "git": "https://phabricator.wikimedia.org/diffusion/PWBC/pywikibot.git",
-            "ref": "05ce190809b679f52bd7b35c91e04ad9bdf2d90b"
+            "hashes": [
+                "sha256:22e587318eb4148b92ae759010a13f2defd8c711c73656ab2dd5b5c19ac4084b"
+            ],
+            "index": "pypi",
+            "version": "==6.6.1"
         },
         "requests": {
             "hashes": [
@@ -642,7 +645,7 @@
                 "sha256:14e99e14e11a14cadf4d99effd4c5c30a9f46b116551ee69b4e5f8f6004f62d5",
                 "sha256:61b247121581f50c7988eece6ebb2d87ccc3be46c5552daf910d56e20cf6da75"
             ],
-            "markers": "python_version >= '3.5'",
+            "markers": "python_full_version >= '3.5.0'",
             "version": "==3.0.0rc1"
         },
         "pytest": {
