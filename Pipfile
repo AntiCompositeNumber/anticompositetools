@@ -21,7 +21,7 @@ mwparserfromhell = "*"
 python-stdnum = "*"
 requests = "*"
 urllib3 = "*"
-pywikibot = {git = "https://phabricator.wikimedia.org/diffusion/PWBC/pywikibot.git"}
+pywikibot = "*"
 fuzzywuzzy = "*"
 pytest = "*"
 Flask = "*"
