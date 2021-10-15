@@ -1,0 +1,40 @@
+[tool.poetry]
+name = "anticompositetools"
+# This version number doesn't do anything. Don't bother changing it.
+version = "0"
+description = ""
+homepage = "https://anticompositetools.toolforge.org"
+authors = ["Your Name <you@example.com>"]
+license = "Apache-2.0"
+packages = [{include = "src"}]
+
+[tool.poetry.dependencies]
+python = "~3.7"
+toolforge = "*"
+phpserialize = "*"
+click = "*"
+mwparserfromhell = "*"
+python-stdnum = "*"
+requests = "*"
+pywikibot = "*"
+fuzzywuzzy = "*"
+Flask = "*"
+PyMySQL = "*"
+requests-oauthlib = "*"
+
+[tool.poetry.dev-dependencies]
+pytest = "*"
+flake8 = "*"
+coveralls = "*"
+black = "*"
+mypy = "*"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.coverage.run]
+branch = true
+source = ["src"]
+
+
