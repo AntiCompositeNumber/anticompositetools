@@ -14,14 +14,14 @@
 # exit on error
 set -e
 
-PROJECT_PATH = $(dirname "$0")
+PROJECT_PATH=$(dirname "$0")
 
 if [ -z "$VIRTUAL_ENV" ]
 then
     # already in a venv, just use that
-    PIP_PATH = "pip"
+    PIP_PATH="pip"
 else
-    PIP_PATH = "$PROJECT_PATH/venv/bin/pip"
+    PIP_PATH="$PROJECT_PATH/venv/bin/pip"
 fi
 
 $PIP_PATH install --upgrade pip wheel
