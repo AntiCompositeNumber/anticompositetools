@@ -21,6 +21,7 @@ fuzzywuzzy = "*"
 Flask = "*"
 PyMySQL = "*"
 requests-oauthlib = "*"
+python-Levenshtein = "^0.12.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "*"
@@ -37,4 +38,7 @@ build-backend = "poetry.core.masonry.api"
 branch = true
 source = ["src"]
 
+[tool.pytest.ini_options]
+log_level = "info"
+addopts = "-v --strict-markers"
 
