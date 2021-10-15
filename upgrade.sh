@@ -16,7 +16,7 @@ set -e
 
 PROJECT_PATH=$(dirname "$0")
 
-if [ -z "$VIRTUAL_ENV" ]
+if "$VIRTUAL_ENV"
 then
     # already in a venv, just use that
     PIP_PATH="pip"
@@ -25,4 +25,4 @@ else
 fi
 
 $PIP_PATH install --upgrade pip wheel
-$PIP_PATH install $PROJECT_PATH
+$PIP_PATH install "$PROJECT_PATH/"
