@@ -16,7 +16,7 @@ set -e
 
 PROJECT_PATH=$(dirname "$0")
 
-if "$VIRTUAL_ENV"
+if [ "$VIRTUAL_ENV" ]
 then
     # already in a venv, just use that
     PIP_PATH="pip"
