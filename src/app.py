@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-# Copyright 2019 AntiCompositeNumber
+# Copyright 2021 AntiCompositeNumber
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,10 +17,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import sys
+"""Toolforge uwsgi stub"""
 
-sys.path.append(os.getcwd()[:-4])
-from src import create_app  # noqa E402
+from anticompositetools import create_app
 
 app = create_app()
