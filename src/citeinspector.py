@@ -37,7 +37,7 @@ class HandledError(Exception):
     Attributes:
         orig_type -- Original exception type
         message -- Additional message (optional)
-        """
+    """
 
     def __init__(self, orig_type, message=None):
         self.orig_type = orig_type
@@ -309,7 +309,7 @@ def concat_items(wikitext_data, citoid_data):
 
     templatedata = citoid_data["template_data"]
     keys = list(wt_citedata)
-    for key in ct_citedata:
+    for key in ct_citedata.copy():
         if key not in keys:
             # Switch key from citoid to param alias used in wikitext
             aliases = templatedata["params"].get(key, {}).get("aliases", [])
