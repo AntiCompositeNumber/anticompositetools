@@ -399,11 +399,11 @@ soap-fallback = ["pysimplesoap"]
 
 [[package]]
 name = "pywikibot"
-version = "6.6.4"
+version = "7.0.0"
 description = "Python MediaWiki Bot Framework"
 category = "main"
 optional = false
-python-versions = ">=3.5.0"
+python-versions = ">=3.5.3"
 
 [package.dependencies]
 requests = {version = ">=2.20.1", markers = "python_version >= \"3.6\""}
@@ -414,14 +414,14 @@ Graphviz = ["pydot (>=1.2)"]
 Tkinter = ["Pillow (>=8.1.1)"]
 "commons_information.py" = ["mwparserfromhell (>=0.5.0)"]
 eventstreams = ["sseclient (>=0.0.18,!=0.0.23,!=0.0.24)"]
-flake8 = ["flake8 (>=3.9.1)", "pydocstyle (>=4.0.0)", "flake8-bugbear (!=21.4.1)", "flake8-coding", "flake8-colors (>=0.1.9)", "flake8-docstrings (>=1.3.1)", "flake8-future-import", "flake8-mock (>=0.3)", "flake8-print (>=2.0.1)", "flake8-quotes (>=2.0.1)", "flake8-string-format", "flake8-tuple (>=0.2.8)", "flake8-no-u-prefixed-strings (>=0.2)", "pep8-naming (>=0.7)", "pyflakes (>=2.1.0)", "flake8-comprehensions (>=2.2.0)", "flake8-comprehensions (>=3.1.4)"]
+flake8 = ["flake8 (>=3.9.1)", "darglint", "pydocstyle (>=4.0.0)", "flake8-bugbear (!=21.4.1,!=21.11.28)", "flake8-coding", "flake8-colors (>=0.1.9)", "flake8-docstrings (>=1.3.1)", "flake8-future-import", "flake8-mock (>=0.3)", "flake8-print (>=2.0.1)", "flake8-quotes (>=2.0.1)", "flake8-string-format", "flake8-tuple (>=0.2.8)", "flake8-no-u-prefixed-strings (>=0.2)", "pep8-naming (>=0.7)", "pyflakes (>=2.1.0)", "flake8-comprehensions (>=2.2.0)", "flake8-comprehensions (>=3.1.4)"]
 hacking = ["hacking"]
 html = ["beautifulsoup4"]
 http = ["fake-useragent"]
-isbn = ["python-stdnum (>=1.16)"]
+isbn = ["python-stdnum (>=1.17)"]
 mwoauth = ["mwoauth (>=0.2.4,!=0.3.1)"]
 mwparserfromhell = ["mwparserfromhell (>=0.5.0)"]
-mysql = ["PyMySQL (>=0.6.7,<1.0.0)", "PyMySQL (>=1.0.0)"]
+mysql = ["PyMySQL (>=0.7.11,<1.0.0)", "PyMySQL (>=1.0.0)"]
 "patrol.py" = ["mwparserfromhell (>=0.5.0)"]
 scripts = ["mwparserfromhell (>=0.5.0)", "mwparserfromhell (>=0.5.0)", "memento_client (>=0.5.1,!=0.6.0)"]
 "weblinkchecker.py" = ["memento_client (>=0.5.1,!=0.6.0)"]
@@ -826,7 +826,7 @@ python-stdnum = [
     {file = "python_stdnum-1.17-py2.py3-none-any.whl", hash = "sha256:a46e6cf9652807314d369b654b255c86a59f93d18be2834f3d567ed1a346c547"},
 ]
 pywikibot = [
-    {file = "pywikibot-6.6.4.tar.gz", hash = "sha256:5d5375d382a2064213a25cbdde97b8258ef2ac963d310422099e1be480e079e5"},
+    {file = "pywikibot-7.0.0.tar.gz", hash = "sha256:a0f8ae0f1d5ae9016c2178d0d8d85f0e52e373ea081fe0738f27be4db7ccb44f"},
 ]
 requests = [
     {file = "requests-2.27.1-py2.py3-none-any.whl", hash = "sha256:f22fa1e554c9ddfd16e6e41ac79759e17be9e492b3587efa038054674760e72d"},
