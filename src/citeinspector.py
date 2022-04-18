@@ -201,7 +201,10 @@ def get_citoid_data(ident, session):
     rest_api = "https://en.wikipedia.org/api/rest_v1/"
 
     url = f"{rest_api}data/citation/mediawiki/{urllib.parse.quote_plus(ident)}"
-    data = get_retry(url, session, output="json")
+    try:
+        data = get_retry(url, session, output="json")
+    except Exception:
+        data = None
     if data is not None:
         return data[0]
     else:
