@@ -60,7 +60,6 @@ def create_app(test_config=None):
         hyphenator,
         citeinspector,
         deploy,
-        movecheck,
         paracheck,
         projectnew,
         filearchive,
@@ -72,7 +71,6 @@ def create_app(test_config=None):
     app.register_blueprint(hyphenator.bp)
     app.register_blueprint(citeinspector.bp)
     app.register_blueprint(deploy.bp)
-    app.register_blueprint(movecheck.bp)
     app.register_blueprint(paracheck.bp)
     app.register_blueprint(projectnew.bp)
     app.register_blueprint(filearchive.bp)
