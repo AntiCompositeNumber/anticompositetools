@@ -413,7 +413,7 @@ Levenshtein = "0.20.7"
 
 [[package]]
 name = "python-stdnum"
-version = "1.17"
+version = "1.18"
 description = "Python module to handle standardized numbers and codes"
 category = "main"
 optional = false
@@ -989,8 +989,8 @@ python-levenshtein = [
     {file = "python_Levenshtein-0.20.7-py3-none-any.whl", hash = "sha256:88a58b95e3340a918489dac0c78f731323c0a4d8f5564f839ffea80155574e77"},
 ]
 python-stdnum = [
-    {file = "python-stdnum-1.17.tar.gz", hash = "sha256:374e2b5e13912ccdbf50b0b23fca2c3e0531174805c32d74e145f37756328340"},
-    {file = "python_stdnum-1.17-py2.py3-none-any.whl", hash = "sha256:a46e6cf9652807314d369b654b255c86a59f93d18be2834f3d567ed1a346c547"},
+    {file = "python-stdnum-1.18.tar.gz", hash = "sha256:bcc763d9c49ae23da5d2b7a686d5fd1deec9d9051341160a10d1ac723a26bec0"},
+    {file = "python_stdnum-1.18-py2.py3-none-any.whl", hash = "sha256:d7f2a3c7ef4635c957b9cbdd9b1993d1f6ee3a2959f03e172c45440d99f296eb"},
 ]
 pywikibot = [
     {file = "pywikibot-7.7.1-py3-none-any.whl", hash = "sha256:82331fbe1dfa8e2c1114ecb5b7d69e0b723b6266b7c74a30fe38b7ce88885439"},
