@@ -426,7 +426,7 @@ soap-fallback = ["PySimpleSOAP"]
 
 [[package]]
 name = "pywikibot"
-version = "7.7.2"
+version = "7.7.3"
 description = "Python MediaWiki Bot Framework"
 category = "main"
 optional = false
@@ -445,7 +445,7 @@ google = ["google (>=1.7)"]
 graphviz = ["pydot (>=1.2)"]
 hacking = ["hacking", "importlib-metadata (<5.0.0)"]
 html = ["BeautifulSoup4"]
-http = ["fake-useragent"]
+http = ["fake-useragent (<0.1.14)", "fake-useragent (>1.0.1)"]
 isbn = ["python-stdnum (>=1.17)"]
 memento = ["memento-client (==0.6.1)"]
 mwoauth = ["mwoauth (>=0.2.4,!=0.3.1)"]
@@ -993,8 +993,8 @@ python-stdnum = [
     {file = "python_stdnum-1.18-py2.py3-none-any.whl", hash = "sha256:d7f2a3c7ef4635c957b9cbdd9b1993d1f6ee3a2959f03e172c45440d99f296eb"},
 ]
 pywikibot = [
-    {file = "pywikibot-7.7.2-py3-none-any.whl", hash = "sha256:d3040e6edd1d37b25450f146e12f577f94c8c08b4ec72ede01fb625de47e0dec"},
-    {file = "pywikibot-7.7.2.tar.gz", hash = "sha256:0367ce34538ad4a61d87430a6330375a126e5ac7ab3624de14e3b3c7295b295a"},
+    {file = "pywikibot-7.7.3-py3-none-any.whl", hash = "sha256:0787458bcb2f86bf21f7e900b4148a61316540dca31b0fa0b04250d8197a0344"},
+    {file = "pywikibot-7.7.3.tar.gz", hash = "sha256:071b8883c2396c061f210b2369dc1e8cfe2a5dad14fb10a20639df30d729fb5c"},
 ]
 rapidfuzz = [
     {file = "rapidfuzz-2.12.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:129c93a76c4fed176b4eaaf78fecd290932971bca10315dee9feaf94a7b443b1"},
