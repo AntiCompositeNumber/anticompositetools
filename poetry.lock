@@ -1036,19 +1036,19 @@ files = [
 
 [[package]]
 name = "toolforge"
-version = "5.0.0"
+version = "6.0.0"
 description = "Small library for common tasks on Wikimedia Toolforge"
 category = "main"
 optional = false
-python-versions = ">=3.4"
+python-versions = ">=3.7"
 files = [
-    {file = "toolforge-5.0.0-py3-none-any.whl", hash = "sha256:280793ebef3e06b2ee76969a1edaf3ab11be169ed5a9b8ed315c207aa85986e6"},
-    {file = "toolforge-5.0.0.tar.gz", hash = "sha256:c8fbd199437faf7db6597c8cb1072de97f01fed706cd83740edf7a9ac9831065"},
+    {file = "toolforge-6.0.0-py3-none-any.whl", hash = "sha256:47eb9be9c57b9d2b0598db1f65956dc6e6ab3499959fe8a21946a881ed032793"},
+    {file = "toolforge-6.0.0.tar.gz", hash = "sha256:457a684c9ec4f3eaadf7ea1c593cdcbe7e179240e056c57a1764fcd9621ea2b0"},
 ]
 
 [package.dependencies]
-pymysql = {version = "*", markers = "python_version >= \"3.6\""}
-requests = "*"
+pymysql = ">=1.0.3"
+requests = ">=2.28.2"
 
 [[package]]
 name = "typing-extensions"
