@@ -816,18 +816,18 @@ soap-fallback = ["PySimpleSOAP"]
 
 [[package]]
 name = "pywikibot"
-version = "8.0.3"
+version = "8.1.0"
 description = "Python MediaWiki Bot Framework"
 category = "main"
 optional = false
 python-versions = ">=3.6.1"
 files = [
-    {file = "pywikibot-8.0.3-py3-none-any.whl", hash = "sha256:a1c90f6d4d46bad91e451b773c5caa4800b5fcfa21ccf5e32f3276a6a533b954"},
-    {file = "pywikibot-8.0.3.tar.gz", hash = "sha256:35e8d6933c857bdc7fd0196a6cd4a26bec47b8b1f5eaa7eaa46cf8d3de2e26f0"},
+    {file = "pywikibot-8.1.0-py3-none-any.whl", hash = "sha256:5d945ee05334cee5a2a0886c2a2eedfb28040488d120b5e15796b68d2aaadf4e"},
+    {file = "pywikibot-8.1.0.tar.gz", hash = "sha256:b5a02b32a43a14d22b2d236b585c2d7514051846edbcfb0daf7704b5aaaca3a3"},
 ]
 
 [package.dependencies]
-mwparserfromhell = ">=0.6.3"
+mwparserfromhell = ">=0.5.2"
 requests = {version = ">=2.21.0", markers = "python_version >= \"3.7\""}
 setuptools = {version = ">=40.8.0", markers = "python_version >= \"3.7\" and python_version < \"3.10\""}
 
