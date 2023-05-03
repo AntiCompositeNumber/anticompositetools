@@ -1,5 +1,5 @@
 # AntiCompositeTools
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/AntiCompositeNumber/anticompositetools/Python%20application)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/AntiCompositeNumber/anticompositetools/pythonapp.yml?branch=master)
 ![Uptime Robot status](https://img.shields.io/uptimerobot/status/m783972628-037856cb670609254a10c883?label=website%20status)
 [![Coverage Status](https://coveralls.io/repos/github/AntiCompositeNumber/anticompositetools/badge.svg?branch=master)](https://coveralls.io/github/AntiCompositeNumber/anticompositetools?branch=master)
 ![Python version 3.9](https://img.shields.io/badge/python-v3.9-blue)
