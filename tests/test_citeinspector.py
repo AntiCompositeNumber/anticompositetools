@@ -418,6 +418,7 @@ def test_get_retry_badmethod():
         )
 
 
+@pytest.mark.skip(reason="https://phabricator.wikimedia.org/T336493")
 def test_citeinspector():
     url = (
         "https://en.wikipedia.org/w/index.php?"
