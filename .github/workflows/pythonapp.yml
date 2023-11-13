@@ -43,13 +43,13 @@ jobs:
     if: contains(github.ref, 'master')
     steps:
     - name: create deployment
-      uses: NiklasMerz/github-deployment-action@v1.1.0
+      uses: NiklasMerz/github-deployment-action@v1.2.2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         args: -o AntiCompositeNumber -r anticompositetools -c master -e production
     - name: set deployment status
-      uses: NiklasMerz/github-deployment-action@v1.1.0
+      uses: NiklasMerz/github-deployment-action@v1.2.2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
