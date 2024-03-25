@@ -5,7 +5,7 @@ version = "0"
 description = ""
 homepage = "https://anticompositetools.toolforge.org"
 authors = ["Your Name <you@example.com>"]
-license = "Apache-2.0"
+license = "AGPL-3.0-or-later"
 packages = [{include = "src"}]
 
 [tool.poetry.dependencies]
