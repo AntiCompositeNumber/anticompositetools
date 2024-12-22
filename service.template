@@ -16,9 +16,6 @@ backend: kubernetes
 # Set ReplicaSet size for a Kubernetes deployment (--replicas=...)
 #replicas: 2
 
-# Redirect tools.wmflabs.org/{TOOL} to {TOOL}.toolforge.org (--canonical)
-canonical: True
-
 # Runtime type
 # See "Supported webservice types" in `webservice --help` output for valid values.
 type: python3.9
