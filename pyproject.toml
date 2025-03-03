@@ -23,7 +23,7 @@ PyMySQL = "*"
 requests-oauthlib = "*"
 python-Levenshtein = "*"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pytest = "*"
 flake8 = "*"
 coveralls = "*"
