@@ -66,14 +66,14 @@ files = [
 
 [[package]]
 name = "certifi"
-version = "2025.11.12"
+version = "2026.2.25"
 description = "Python package for providing Mozilla's CA Bundle."
 optional = false
 python-versions = ">=3.7"
 groups = ["main", "dev"]
 files = [
-    {file = "certifi-2025.11.12-py3-none-any.whl", hash = "sha256:97de8790030bbd5c2d96b7ec782fc2f7820ef8dba6db909ccf95449f2d062d4b"},
-    {file = "certifi-2025.11.12.tar.gz", hash = "sha256:d8ab5478f2ecd78af242878415affce761ca6bc54a22a27e026d7c25357c3316"},
+    {file = "certifi-2026.2.25-py3-none-any.whl", hash = "sha256:027692e4402ad994f1c42e52a4997a9763c646b73e4096e4d5d6db8af1d6f0fa"},
+    {file = "certifi-2026.2.25.tar.gz", hash = "sha256:e887ab5cee78ea814d3472169153c2d12cd43b14bd03329a39a9c6e2e80bfba7"},
 ]
 
 [[package]]
@@ -425,14 +425,14 @@ pyflakes = ">=3.4.0,<3.5.0"
 
 [[package]]
 name = "flask"
-version = "3.1.2"
+version = "3.1.3"
 description = "A simple framework for building complex web applications."
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "flask-3.1.2-py3-none-any.whl", hash = "sha256:ca1d8112ec8a6158cc29ea4858963350011b5c846a414cdb7a954aa9e967d03c"},
-    {file = "flask-3.1.2.tar.gz", hash = "sha256:bf656c15c80190ed628ad08cdfd3aaa35beb087855e2f494910aa3774cc4fd87"},
+    {file = "flask-3.1.3-py3-none-any.whl", hash = "sha256:f4bcbefc124291925f1a26446da31a5178f9483862233b23c0c96a20701f670c"},
+    {file = "flask-3.1.3.tar.gz", hash = "sha256:0ef0e52b8a9cd932855379197dd8f94047b359ca0a78695144304cb45f87c9eb"},
 ]
 
 [package.dependencies]
@@ -994,14 +994,14 @@ signedtoken = ["cryptography (>=3.0.0)", "pyjwt (>=2.0.0,<3)"]
 
 [[package]]
 name = "packaging"
-version = "25.0"
+version = "26.0"
 description = "Core utilities for Python packages"
 optional = false
 python-versions = ">=3.8"
 groups = ["main", "dev"]
 files = [
-    {file = "packaging-25.0-py3-none-any.whl", hash = "sha256:29572ef2b1f17581046b3a2227d5c611fb25ec70ca1ba8554b24b0e69331a484"},
-    {file = "packaging-25.0.tar.gz", hash = "sha256:d443872c98d677bf60f6a1f2f8c1cb748e8fe762d2bf9d3148b5599295b0fc4f"},
+    {file = "packaging-26.0-py3-none-any.whl", hash = "sha256:b36f1fef9334a5588b4166f8bcd26a14e521f2b55e6b9de3aaa80d3ff7a37529"},
+    {file = "packaging-26.0.tar.gz", hash = "sha256:00243ae351a257117b6a241061796684b084ed1c516a08c48a3f7e147a9d80b4"},
 ]
 
 [[package]]
@@ -1156,14 +1156,14 @@ Levenshtein = "0.27.1"
 
 [[package]]
 name = "python-stdnum"
-version = "2.1"
+version = "2.2"
 description = "Python module to handle standardized numbers and codes"
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
 files = [
-    {file = "python_stdnum-2.1-py3-none-any.whl", hash = "sha256:25eabcf5f307dd4150fd8f1c03f4512a6caeb84c9f09be1448711f5803373c58"},
-    {file = "python_stdnum-2.1.tar.gz", hash = "sha256:6b01645969eb3dfd55061a0114d593753cd9e653cea9083198b7eea12644397a"},
+    {file = "python_stdnum-2.2-py3-none-any.whl", hash = "sha256:bdf98fd117a0ca152e4047aa8ad254bae63853d4e915ddd4e0effb33ba0e9260"},
+    {file = "python_stdnum-2.2.tar.gz", hash = "sha256:e95fcfa858a703d4a40130cb3eaac133c60d8808a7f3c98efeedac968c2479b9"},
 ]
 
 [package.extras]
@@ -1186,36 +1186,35 @@ dev = ["black", "build", "mypy", "pytest", "pytest-cov", "setuptools", "tox", "t
 
 [[package]]
 name = "pywikibot"
-version = "10.7.4"
+version = "11.0.0"
 description = "Python MediaWiki Bot Framework"
 optional = false
-python-versions = ">=3.8.0"
+python-versions = ">=3.9.0"
 groups = ["main"]
 files = [
-    {file = "pywikibot-10.7.4-py3-none-any.whl", hash = "sha256:ae1353fbf3321c55c4b52f71194d04c7d70ece7d65c856e8539b2d5b9fbd2042"},
-    {file = "pywikibot-10.7.4.tar.gz", hash = "sha256:fe11df6512e812068f2992eeb3dc7f7793bad869f053fd40ecf02c79b1a3eb7e"},
+    {file = "pywikibot-11.0.0-py3-none-any.whl", hash = "sha256:a03b488408a681ffe215da87f152e8b8bcfb5e1216a604ace1225c18b59202f9"},
+    {file = "pywikibot-11.0.0.tar.gz", hash = "sha256:376677d70f770e4c811dd4f0a117574febd77888fbc85426fd2e9ef2ff777ad3"},
 ]
 
 [package.dependencies]
-mwparserfromhell = ">=0.5.2"
-packaging = "*"
-requests = ">=2.31.0"
+mwparserfromhell = ">=0.7.2"
+packaging = ">=25.0"
+requests = ">=2.32.3"
 
 [package.extras]
-create-isbn-edition-py = ["isbnlib", "unidecode"]
-eventstreams = ["requests-sse (>=0.5.0)"]
+eventstreams = ["requests-sse (>=0.5.2)"]
 google = ["googlesearch-python (>=1.3.0)"]
-graphviz = ["pydot (>=3.0.2)"]
-html = ["beautifulsoup4 (>=4.7.1)"]
-http = ["fake-useragent (==1.5.1) ; python_version < \"3.9\"", "fake-useragent (>=2.0.3) ; python_version > \"3.8\""]
-isbn = ["python-stdnum (>=1.20)"]
+graphviz = ["pydot (>=4.0.1)"]
+html = ["beautifulsoup4 (>=4.14.3)"]
+http = ["fake-useragent (>=2.2.0)"]
+isbn = ["python-stdnum (>=2.2)"]
 memento = ["memento_client (==0.6.1)"]
-mwoauth = ["PyJWT (!=2.10.0,!=2.10.1) ; python_version > \"3.8\"", "mwoauth (>=0.2.4,!=0.3.1)"]
-mysql = ["PyMySQL (>=1.1.1)"]
-scripts = ["isbnlib", "memento_client (==0.6.1)", "unidecode"]
-tkinter = ["Pillow (==10.4.0) ; platform_python_implementation != \"PyPy\" and python_version < \"3.9\"", "Pillow (==10.4.0) ; platform_python_implementation == \"PyPy\" and python_version < \"3.9\"", "Pillow (>=11.1.0) ; platform_python_implementation != \"PyPy\" and python_version >= \"3.10\"", "Pillow (>=11.1.0) ; platform_python_implementation == \"PyPy\" and python_version >= \"3.11\"", "Pillow (>=11.1.0,<11.3.0) ; platform_python_implementation != \"PyPy\" and python_version == \"3.9\"", "Pillow (>=11.1.0,<11.3.0) ; platform_python_implementation == \"PyPy\" and python_version >= \"3.9\" and python_version < \"3.11\""]
+mwoauth = ["PyJWT (!=2.10.0,!=2.10.1)", "mwoauth (>=0.4.0)"]
+mysql = ["PyMySQL (>=1.1.2)"]
+scripts = ["memento_client (==0.6.1)"]
+tkinter = ["Pillow (==10.4.0) ; platform_python_implementation == \"PyPy\" and python_version == \"3.9\"", "Pillow (==11.3.0) ; platform_python_implementation == \"CPython\" and python_version == \"3.9\"", "Pillow (==11.3.0) ; platform_python_implementation == \"PyPy\" and python_version == \"3.10\"", "Pillow (==12.1.0) ; platform_python_implementation == \"PyPy\" and python_version >= \"3.11\"", "Pillow (>=12.1.0) ; platform_python_implementation == \"CPython\" and python_version >= \"3.10\""]
 weblinkchecker-py = ["memento_client (==0.6.1)"]
-wikitextparser = ["wikitextparser (>=0.56.3)"]
+wikitextparser = ["wikitextparser (>=0.56.4)"]
 
 [[package]]
 name = "rapidfuzz"
@@ -1449,14 +1448,14 @@ files = [
 
 [[package]]
 name = "urllib3"
-version = "2.6.2"
+version = "2.6.3"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
 optional = false
 python-versions = ">=3.9"
 groups = ["main", "dev"]
 files = [
-    {file = "urllib3-2.6.2-py3-none-any.whl", hash = "sha256:ec21cddfe7724fc7cb4ba4bea7aa8e2ef36f607a4bab81aa6ce42a13dc3f03dd"},
-    {file = "urllib3-2.6.2.tar.gz", hash = "sha256:016f9c98bb7e98085cb2b4b17b87d2c702975664e4f060c6532e64d1c1a5e797"},
+    {file = "urllib3-2.6.3-py3-none-any.whl", hash = "sha256:bf272323e553dfb2e87d9bfd225ca7b0f467b919d7bbd355436d3fd37cb0acd4"},
+    {file = "urllib3-2.6.3.tar.gz", hash = "sha256:1b62b6884944a57dbe321509ab94fd4d3b307075e0c2eae991ac71ee15ad38ed"},
 ]
 
 [package.extras]
@@ -1467,14 +1466,14 @@ zstd = ["backports-zstd (>=1.0.0) ; python_version < \"3.14\""]
 
 [[package]]
 name = "werkzeug"
-version = "3.1.4"
+version = "3.1.6"
 description = "The comprehensive WSGI web application library."
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "werkzeug-3.1.4-py3-none-any.whl", hash = "sha256:2ad50fb9ed09cc3af22c54698351027ace879a0b60a3b5edf5730b2f7d876905"},
-    {file = "werkzeug-3.1.4.tar.gz", hash = "sha256:cd3cd98b1b92dc3b7b3995038826c68097dcb16f9baa63abe35f20eafeb9fe5e"},
+    {file = "werkzeug-3.1.6-py3-none-any.whl", hash = "sha256:7ddf3357bb9564e407607f988f683d72038551200c704012bb9a4c523d42f131"},
+    {file = "werkzeug-3.1.6.tar.gz", hash = "sha256:210c6bede5a420a913956b4791a7f4d6843a43b6fcee4dfa08a65e93007d0d25"},
 ]
 
 [package.dependencies]
