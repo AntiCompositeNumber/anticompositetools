@@ -95,19 +95,20 @@ def _db_get_new_category_pages(
     if not wmcs:
         raise ConnectionError
 
-    query = (
-        "SELECT page_namespace, page_title, cl_timestamp "
-        "FROM "
-        "    categorylinks "
-        "    JOIN page ON page_id = cl_from "
-        "WHERE "
-        '    cl_to = "{catname}" AND '
-        '    cl_type = "page" AND '
-        "    cl_timestamp >= {start_timestamp} AND "
-        "    cl_timestamp < {end_timestamp} AND "
-        "    page_namespace in ({nslist}) "
-        "ORDER BY cl_timestamp "
-    ).format(
+    query = """
+SELECT page_namespace, page_title, cl_timestamp
+FROM
+    categorylinks
+    JOIN linktarget ON cl_target_id = lt_id AND lt_namespace = 14
+    JOIN page ON page_id = cl_from
+WHERE
+    lt_title = "{catname}"
+    AND cl_type = "page"
+    AND cl_timestamp >= {start_timestamp}
+    AND cl_timestamp < {end_timestamp}
+    AND page_namespace in ({nslist})
+ORDER BY cl_timestamp
+        """.format(
         catname=category.title(underscore=True, with_ns=False),
         start_timestamp=start_time.totimestampformat(),
         end_timestamp=end_time.totimestampformat(),
